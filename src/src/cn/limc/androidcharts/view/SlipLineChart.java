@@ -21,8 +21,12 @@
 
 package cn.limc.androidcharts.view;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.util.LangUtils;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -30,8 +34,8 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.MotionEvent;
-
 import cn.limc.androidcharts.entity.DateValueEntity;
 import cn.limc.androidcharts.entity.LineEntity;
 import cn.limc.androidcharts.event.IGestureDetector;
@@ -40,7 +44,6 @@ import cn.limc.androidcharts.event.IZoomable;
 import cn.limc.androidcharts.event.OnSlipGestureListener;
 import cn.limc.androidcharts.event.OnZoomGestureListener;
 import cn.limc.androidcharts.event.SlipGestureDetector;
-
 
 /**
  * <p>
@@ -57,8 +60,8 @@ import cn.limc.androidcharts.event.SlipGestureDetector;
  * @version v1.0 2014/01/21 14:20:35
  * 
  */
-public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
-	
+public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
+
 	public static final int DEFAULT_LINE_ALIGN_TYPE = ALIGN_TYPE_CENTER;
 
 	public static final int DEFAULT_DISPLAY_FROM = 0;
@@ -89,7 +92,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 * min value of Y axis
 	 * </p>
 	 * <p>
-	 * Y軸の最小値
+	 * F Y軸の最小値
 	 * </p>
 	 * <p>
 	 * Y的最小表示值
@@ -109,12 +112,12 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 * </p>
 	 */
 	protected double maxValue;
-	
+
 	protected int lineAlignType = DEFAULT_LINE_ALIGN_TYPE;
-	
+
 	protected OnZoomGestureListener onZoomGestureListener = new OnZoomGestureListener();
 	protected OnSlipGestureListener onSlipGestureListener = new OnSlipGestureListener();
-	
+
 	protected IGestureDetector slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
 
 	/*
@@ -168,7 +171,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 			LineEntity<DateValueEntity> line = this.linesData.get(i);
 			if (line != null && line.getLineData().size() > 0) {
 				// 判断显示为方柱或显示为线条
-				for (int j = displayFrom; j < displayFrom + displayNumber; j++) {
+				for (int j = displayFrom; j < displayFrom + displayDataSize; j++) {
 					DateValueEntity lineData = line.getLineData().get(j);
 					if (lineData.getValue() < minValue) {
 						minValue = lineData.getValue();
@@ -186,22 +189,25 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		this.minValue = minValue;
 	}
 
+	// 计算值的范围
 	protected void calcValueRangePaddingZero() {
 		double maxValue = this.maxValue;
 		double minValue = this.minValue;
 
-		if ((long) maxValue > (long) minValue) {
-			if ((maxValue - minValue) < 10. && minValue > 1.) {
-				this.maxValue = (long) (maxValue + 1);
-				this.minValue = (long) (minValue - 1);
-			} else {
-				this.maxValue = (long) (maxValue + (maxValue - minValue) * 0.1);
-				this.minValue = (long) (minValue - (maxValue - minValue) * 0.1);
-
-				if (this.minValue < 0) {
-					this.minValue = 0;
-				}
-			}
+		if (maxValue > minValue) {
+			// if ((maxValue - minValue) < 10. && minValue > 1.) {
+			// this.maxValue = (long) (maxValue + 1);
+			// this.minValue = (long) (minValue - 1);
+			// } else {
+			// this.maxValue = (long) (maxValue + (maxValue - minValue) * 0.1);
+			// this.minValue = (long) (minValue - (maxValue - minValue) * 0.1);
+			//
+			// if (this.minValue < 0) {
+			// this.minValue = 0;
+			// }
+			// }
+			this.maxValue = maxValue;
+			this.minValue = minValue;
 		} else if ((long) maxValue == (long) minValue) {
 			if (maxValue <= 10 && maxValue > 1) {
 				this.maxValue = maxValue + 1;
@@ -262,20 +268,14 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		}
 
 		// 等分轴修正
-		if (this.latitudeNum > 0 && rate > 1
-				&& (long) (this.minValue) % rate != 0) {
+		if (this.latitudeNum > 0 && rate > 1 && (long) (this.minValue) % rate != 0) {
 			// 最大值加上轴差
-			this.minValue = (long) this.minValue
-					- ((long) (this.minValue) % rate);
+			this.minValue = (long) this.minValue - ((long) (this.minValue) % rate);
 		}
 		// 等分轴修正
-		if (this.latitudeNum > 0
-				&& (long) (this.maxValue - this.minValue)
-						% (this.latitudeNum * rate) != 0) {
+		if (this.latitudeNum > 0 && (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate) != 0) {
 			// 最大值加上轴差
-			this.maxValue = (long) this.maxValue
-					+ (this.latitudeNum * rate)
-					- ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
+			this.maxValue = (long) this.maxValue + (this.latitudeNum * rate) - ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
 		}
 	}
 
@@ -340,8 +340,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		if (null == this.linesData) {
 			return "";
 		}
-		LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-				.get(0);
+		LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(0);
 		if (line == null) {
 			return "";
 		}
@@ -366,29 +365,27 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	@Override
 	public String getAxisYGraduate(Object value) {
 		float graduate = Float.valueOf(super.getAxisYGraduate(value));
-		return String.valueOf((int) Math.floor(graduate * (maxValue - minValue)
-				+ minValue));
+		return String.valueOf((int) Math.floor(graduate * (maxValue - minValue) + minValue));
 	}
 
-	
-	public float longitudePostOffset(){
+	public float longitudePostOffset() {
 		if (lineAlignType == ALIGN_TYPE_CENTER) {
 			float lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber;
-			return (this.dataQuadrant.getQuadrantPaddingWidth() - lineLength)/ (longitudeTitles.size() - 1);
-	    }else{
-			return this.dataQuadrant.getQuadrantPaddingWidth()/ (longitudeTitles.size() - 1);
-	    }
+			return (this.dataQuadrant.getQuadrantPaddingWidth() - lineLength) / (longitudeTitles.size() - 1);
+		} else {
+			return this.dataQuadrant.getQuadrantPaddingWidth() / (longitudeTitles.size() - 1);
+		}
 	}
-	
-	public float longitudeOffset(){
+
+	public float longitudeOffset() {
 		if (lineAlignType == ALIGN_TYPE_CENTER) {
 			float lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber;
 			return dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-		}else{
+		} else {
 			return dataQuadrant.getQuadrantPaddingStartX();
 		}
 	}
-	
+
 	/**
 	 * <p>
 	 * initialize degrees on Y axis
@@ -401,14 +398,53 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 * </p>
 	 */
 	protected void initAxisY() {
-		this.calcValueRange();
+		// 注释掉从数据中计算最大值和最小值
+		// this.calcValueRange();
+
+		// rawMethodTitleY(titleY);
+		List<String> titleY = initYAxisTitle();
+		super.setLatitudeTitles(titleY);
+	}
+
+	private List<String> initYAxisTitle() {
 		List<String> titleY = new ArrayList<String>();
+		String yPrice = null;
+		for (int i = 0; i <= this.getLatitudeNum(); i++) {
+			if (i == 0) {
+				double price = closingPrice - maxChangPrice;
+				yPrice = roundDouble(price, 3);
+
+				titleY.add(yPrice);
+			} else if (i == 1) {
+				yPrice = roundDouble(closingPrice, 3);
+				titleY.add(yPrice);
+			} else if (i == 2) {
+				double price = closingPrice + maxChangPrice;
+				yPrice = roundDouble(price, 3);
+				titleY.add(yPrice);
+			}
+		}
+		return titleY;
+	}
+
+	private String roundDouble(double value, int places) {
+		BigDecimal bd = new BigDecimal(value);
+		bd.setScale(places, RoundingMode.HALF_UP);
+		String formatPrice = Double.toString(value);
+		int index = formatPrice.indexOf(".");
+		Log.i("info", "value=" + value + ",price=" + formatPrice + ",priceLength=" + formatPrice.length());
+		if (formatPrice.length() < 4) {
+			return formatPrice;
+		} else {
+			return formatPrice.substring(0, index + 3);
+		}
+	}
+
+	private void rawMethodTitleY(List<String> titleY) {
 		float average = (int) ((maxValue - minValue) / this.getLatitudeNum());
-		;
 		// calculate degrees on Y axis
 		for (int i = 0; i < this.getLatitudeNum(); i++) {
-			String value = String.valueOf((int) Math.floor(minValue + i
-					* average));
+			String value = String.valueOf((int) Math.floor(minValue + i * average));
 			if (value.length() < super.getLatitudeMaxTitleLength()) {
 				while (value.length() < super.getLatitudeMaxTitleLength()) {
 					value = " " + value;
@@ -424,8 +460,6 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 			}
 		}
 		titleY.add(value);
-
-		super.setLatitudeTitles(titleY);
 	}
 
 	/**
@@ -440,7 +474,12 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 * </p>
 	 */
 	protected void initAxisX() {
-		List<String> titleX = new ArrayList<String>();
+		ArrayList<String> titleX = initXAxisDate();
+		// rawMethod(titleX);
+		super.setLongitudeTitles(titleX);
+	}
+
+	private void rawMethod(ArrayList<String> titleX) {
 		if (null != linesData && linesData.size() > 0) {
 			float average = displayNumber / this.getLongitudeNum();
 			for (int i = 0; i < this.getLongitudeNum(); i++) {
@@ -449,16 +488,54 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 					index = displayNumber - 1;
 				}
 				index = index + displayFrom;
-				titleX.add(String.valueOf(
-						linesData.get(0).getLineData().get(index).getDate())
-						.substring(4));
+				// title x只能显示当前时间之前 若要修改,还需修改
+				if (index < displayDataSize) {
+					titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()));
+				}
+				// if
+				// (String.valueOf(linesData.get(0).getLineData().get(index).getDate()).length()
+				// >= 4) {
+				// titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()).substring(4));
+				// } else if
+				// (String.valueOf(linesData.get(0).getLineData().get(index).getDate()).length()
+				// == 3) {
+				// titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()).substring(3));
+				// } else if
+				// (String.valueOf(linesData.get(0).getLineData().get(index).getDate()).length()
+				// == 2) {
+				// titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()).substring(2));
+				// } else if
+				// (String.valueOf(linesData.get(0).getLineData().get(index).getDate()).length()
+				// == 1) {
+				// titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()).substring(1));
+				// } else if
+				// (String.valueOf(linesData.get(0).getLineData().get(index).getDate()).length()
+				// == 1) {
+				// titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()));
+				// }
 			}
-			titleX.add(String.valueOf(
-					linesData.get(0).getLineData()
-							.get(displayFrom + displayNumber - 1).getDate())
-					.substring(4));
+			titleX.add(String.valueOf(linesData.get(0).getLineData().get(displayFrom + displayDataSize - 1).getDate()));
 		}
-		super.setLongitudeTitles(titleX);
+	}
+
+	private ArrayList<String> initXAxisDate() {
+		ArrayList<String> titleX = new ArrayList<String>();
+		String xAxisDate = null;
+		for (int i = 0; i <= this.getLongitudeNum(); i++) {
+			if (i == 0) {
+				xAxisDate = "09:30";
+			} else if (i == 1) {
+				xAxisDate = "10:30";
+			} else if (i == 2) {
+				xAxisDate = "11:30/13:00";
+			} else if (i == 3) {
+				xAxisDate = "14:00";
+			} else if (i == 4) {
+				xAxisDate = "15:00";
+			}
+			titleX.add(xAxisDate);
+		}
+		return titleX;
 	}
 
 	/**
@@ -485,8 +562,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 
 		// draw lines
 		for (int i = 0; i < linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -502,25 +578,27 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 			mPaint.setAntiAlias(true);
 			// set start point’s X
 			if (lineAlignType == ALIGN_TYPE_CENTER) {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
-                startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-            }else {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
-                startX = dataQuadrant.getQuadrantPaddingStartX();
-            }
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
+				startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+			} else {
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
+				startX = dataQuadrant.getQuadrantPaddingStartX();
+			}
 			// start point
 			PointF ptFirst = null;
-			for (int j = displayFrom; j < displayFrom + displayNumber; j++) {
+			for (int j = displayFrom; j < displayFrom + displayDataSize - 1; j++) {
 				float value = lineData.get(j).getValue();
 				// calculate Y
-				float valueY = (float) ((1f - (value - minValue)
-						/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
-						+ dataQuadrant.getQuadrantPaddingStartY();
-
+				// float valueY = (float) ((1f - (value - minValue) / (maxValue
+				// - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
+				// + dataQuadrant.getQuadrantPaddingStartY();
+				float valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
+						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
+						- dataQuadrant.getQuadrantPaddingStartY();
 				// if is not last point connect to previous point
+				Log.i("info", "valueY=" + valueY + ",startX=" + startX);
 				if (j > displayFrom) {
-					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY,
-							mPaint);
+					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
 				}
 				// reset
 				ptFirst = new PointF(startX, valueY);
@@ -529,24 +607,29 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		}
 	}
 
-
 	protected float olddistance = 0f;
 	protected float newdistance = 0f;
 
 	protected PointF startPointA;
 	protected PointF startPointB;
 
+	private int displayDataSize;
+
+	private double closingPrice;
+
+	private float maxChangPrice;
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		//valid
-		if (!isValidTouchPoint(event.getX(),event.getY())) {
+		// valid
+		if (!isValidTouchPoint(event.getX(), event.getY())) {
 			return false;
 		}
-		
+
 		if (null == linesData || linesData.size() == 0) {
 			return false;
 		}
-		
+
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
@@ -574,15 +657,15 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 *         </p>
 	 */
 	protected float calcDistance(MotionEvent event) {
-		if(event.getPointerCount() <= 1) {
+		if (event.getPointerCount() <= 1) {
 			return 0f;
-		}else{
+		} else {
 			float x = event.getX(0) - event.getX(1);
 			float y = event.getY(0) - event.getY(1);
 			return FloatMath.sqrt(x * x + y * y);
 		}
 	}
-	
+
 	public void moveRight() {
 		int dataSize = linesData.get(0).getLineData().size();
 		if (displayFrom + displayNumber < dataSize - SLIP_STEP) {
@@ -595,18 +678,19 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		if (displayFrom + displayNumber >= dataSize) {
 			displayFrom = dataSize - displayNumber;
 		}
-		
+
 		this.postInvalidate();
-		
-//		//Listener
-//		if (onSlipGestureListener != null) {
-//			onSlipGestureListener.onSlip(SLIP_DIRECTION_RIGHT, displayFrom, displayNumber);
-//		}
+
+		// //Listener
+		// if (onSlipGestureListener != null) {
+		// onSlipGestureListener.onSlip(SLIP_DIRECTION_RIGHT, displayFrom,
+		// displayNumber);
+		// }
 	}
 
 	public void moveLeft() {
 		int dataSize = linesData.get(0).getLineData().size();
-		
+
 		if (displayFrom <= SLIP_STEP) {
 			displayFrom = 0;
 		} else if (displayFrom > SLIP_STEP) {
@@ -619,13 +703,14 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 		if (displayFrom + displayNumber >= dataSize) {
 			displayFrom = dataSize - displayNumber;
 		}
-		
+
 		this.postInvalidate();
-		
-//		//Listener
-//		if (onSlipGestureListener != null) {
-//			onSlipGestureListener.onSlip(SLIP_DIRECTION_LEFT, displayFrom, displayNumber);
-//		}
+
+		// //Listener
+		// if (onSlipGestureListener != null) {
+		// onSlipGestureListener.onSlip(SLIP_DIRECTION_LEFT, displayFrom,
+		// displayNumber);
+		// }
 	}
 
 	/**
@@ -658,18 +743,17 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 			}
 
 			// 处理displayFrom越界
-			if (displayFrom + displayNumber >= linesData.get(0).getLineData()
-					.size()) {
-				displayFrom = linesData.get(0).getLineData().size()
-						- displayNumber;
+			if (displayFrom + displayNumber >= linesData.get(0).getLineData().size()) {
+				displayFrom = linesData.get(0).getLineData().size() - displayNumber;
 			}
-			
+
 			this.postInvalidate();
-			
-//			//Listener
-//			if (onZoomGestureListener != null) {
-//				onZoomGestureListener.onZoom(ZOOM_IN, displayFrom, displayNumber);
-//			}
+
+			// //Listener
+			// if (onZoomGestureListener != null) {
+			// onZoomGestureListener.onZoom(ZOOM_IN, displayFrom,
+			// displayNumber);
+			// }
 		}
 	}
 
@@ -686,7 +770,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 */
 	public void zoomOut() {
 		int dataSize = linesData.get(0).getLineData().size();
-		
+
 		if (displayNumber < dataSize - 1) {
 			if (displayNumber + ZOOM_STEP > dataSize - 1) {
 				displayNumber = dataSize - 1;
@@ -715,13 +799,14 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 			if (displayFrom + displayNumber >= dataSize) {
 				displayNumber = dataSize - displayFrom;
 			}
-			
+
 			this.postInvalidate();
-			
-//			//Listener
-//			if (onZoomGestureListener != null) {
-//				onZoomGestureListener.onZoom(ZOOM_OUT, displayFrom, displayNumber);
-//			}
+
+			// //Listener
+			// if (onZoomGestureListener != null) {
+			// onZoomGestureListener.onZoom(ZOOM_OUT, displayFrom,
+			// displayNumber);
+			// }
 		}
 	}
 
@@ -751,7 +836,7 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 * @param maxValue
 	 *            the maxValue to set
 	 */
-	public void setMaxValue(int maxValue) {
+	public void setMaxValue(double maxValue) {
 		this.maxValue = maxValue;
 	}
 
@@ -775,6 +860,27 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	 */
 	public int getDisplayNumber() {
 		return displayNumber;
+	}
+
+	/**
+	 * 设置总共的数据数目.
+	 * 
+	 * @param dataSize
+	 */
+	public void setDisplayDataSize(int dataSize) {
+		this.displayDataSize = dataSize;
+	}
+
+	@Override
+	public void setClosingPrice(double closingPrice) {
+		this.closingPrice = closingPrice;
+		Log.i("info", "Line.closingPrice=" + closingPrice);
+	}
+
+	@Override
+	public void setMaxChangPrice(float maxChangPrice) {
+		this.maxChangPrice = maxChangPrice;
+		Log.i("info", "Line.maxChangePrice=" + maxChangPrice);
 	}
 
 	/**
@@ -838,7 +944,8 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	}
 
 	/**
-	 * @param lineAlignType the lineAlignType to set
+	 * @param lineAlignType
+	 *            the lineAlignType to set
 	 */
 	public void setLineAlignType(int lineAlignType) {
 		this.lineAlignType = lineAlignType;
@@ -847,36 +954,46 @@ public class SlipLineChart extends GridChart implements IZoomable,ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param listener 
-	 * @see cn.limc.androidcharts.event.IZoomable#setOnZoomGestureListener(cn.limc.androidcharts.event.OnZoomGestureListener)
+	 * @param listener
+	 * 
+	 * @see
+	 * cn.limc.androidcharts.event.IZoomable#setOnZoomGestureListener(cn.limc
+	 * .androidcharts.event.OnZoomGestureListener)
 	 */
 	public void setOnZoomGestureListener(OnZoomGestureListener listener) {
 		this.onZoomGestureListener = listener;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param listener 
-	 * @see cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc.androidcharts.event.OnSlipGestureListener)
+	 * @param listener
+	 * 
+	 * @see
+	 * cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc
+	 * .androidcharts.event.OnSlipGestureListener)
 	 */
 	public void setOnSlipGestureListener(OnSlipGestureListener listener) {
 		this.onSlipGestureListener = listener;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return 
-	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener() 
+	 * @return
+	 * 
+	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener()
 	 */
 	public OnSlipGestureListener getOnSlipGestureListener() {
 		return onSlipGestureListener;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return 
-	 * @see cn.limc.androidcharts.event.IZoomable#getOnZoomGestureListener() 
+	 * @return
+	 * 
+	 * @see cn.limc.androidcharts.event.IZoomable#getOnZoomGestureListener()
 	 */
 	public OnZoomGestureListener getOnZoomGestureListener() {
 		return onZoomGestureListener;

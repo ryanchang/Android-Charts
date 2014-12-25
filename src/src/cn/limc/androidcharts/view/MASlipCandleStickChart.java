@@ -77,8 +77,7 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 	 * @param attrs
 	 * @param defStyle
 	 */
-	public MASlipCandleStickChart(Context context, AttributeSet attrs,
-			int defStyle) {
+	public MASlipCandleStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
@@ -197,8 +196,7 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 
 		// draw MA lines
 		for (int i = 0; i < linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -217,18 +215,15 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 			startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
 			// start point
 			PointF ptFirst = null;
-			for (int j = super.getDisplayFrom(); j < super.getDisplayFrom()
-					+ super.getDisplayNumber(); j++) {
+			for (int j = super.getDisplayFrom(); j < super.getDisplayFrom() + super.getDisplayNumber(); j++) {
 				float value = lineData.get(j).getValue();
 				// calculate Y
-				float valueY = (float) ((1f - (value - minValue)
-						/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
+				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
 						+ dataQuadrant.getQuadrantPaddingStartY();
 
 				// if is not last point connect to previous point
 				if (j > super.getDisplayFrom()) {
-					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY,
-							mPaint);
+					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
 				}
 				// reset
 				ptFirst = new PointF(startX, valueY);

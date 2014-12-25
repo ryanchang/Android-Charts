@@ -30,6 +30,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 
 /**
  * <p>
@@ -47,6 +48,10 @@ import android.util.AttributeSet;
  * 
  */
 public class SlipAreaChart extends SlipLineChart {
+
+	private double closingPrice;
+	private int displayDataSize;
+	private double maxChangPrice;
 
 	/**
 	 * <p>
@@ -146,8 +151,7 @@ public class SlipAreaChart extends SlipLineChart {
 
 		// draw lines
 		for (int i = 0; i < linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -166,20 +170,23 @@ public class SlipAreaChart extends SlipLineChart {
 
 			// set start point’s X
 			if (lineAlignType == ALIGN_TYPE_CENTER) {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
-                startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-            }else {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
-                startX = dataQuadrant.getQuadrantPaddingStartX();
-            }
-			
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
+				startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+			} else {
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
+				startX = dataQuadrant.getQuadrantPaddingStartX();
+			}
+
 			Path linePath = new Path();
-			for (int j = displayFrom; j < displayFrom + displayNumber; j++) {
+			for (int j = displayFrom; j < displayFrom + displayDataSize - 1; j++) {
 				float value = lineData.get(j).getValue();
-				// calculate Y
-				float valueY = (float) ((1f - (value - minValue)
-						/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
-						+ dataQuadrant.getQuadrantPaddingStartY();
+				// calculate Y 计算画线的Y轴的高度
+				// float valueY = (float) ((1f - (value - minValue) / (maxValue
+				// - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
+				// + dataQuadrant.getQuadrantPaddingStartY();
+				float valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
+						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
+						- dataQuadrant.getQuadrantPaddingStartY();
 
 				// if is not last point connect to previous point
 				if (j == displayFrom) {
@@ -196,5 +203,22 @@ public class SlipAreaChart extends SlipLineChart {
 			linePath.close();
 			canvas.drawPath(linePath, mPaint);
 		}
+	}
+
+	public void setDisplayDataSizeInChild(int dataSize) {
+		this.displayDataSize = dataSize;
+		super.setDisplayDataSize(dataSize);
+	}
+
+	public void setClosingPrice(double closingPrice) {
+		super.setClosingPrice(closingPrice);
+		this.closingPrice = closingPrice;
+		Log.i("info", "Area.closingPrice=" + closingPrice);
+	}
+
+	public void setMaxChangPrice(float maxChangPrice) {
+		super.setMaxChangPrice(maxChangPrice);
+		this.maxChangPrice = maxChangPrice;
+		Log.i("info", "Area.maxChangePrice=" + maxChangPrice);
 	}
 }

@@ -50,6 +50,8 @@ public class ColoredSlipStickChart extends SlipStickChart {
 	public static final int DEFAULT_COLORED_STICK_STYLE = DEFAULT_COLORED_STICK_STYLE_NO_BORDER;
 
 	private int coloredStickStyle = DEFAULT_COLORED_STICK_STYLE_NO_BORDER;
+	// 所要显示的数据量
+	private int dataSize;
 
 	/**
 	 * <p>
@@ -83,8 +85,7 @@ public class ColoredSlipStickChart extends SlipStickChart {
 	 * @param attrs
 	 * @param defStyle
 	 */
-	public ColoredSlipStickChart(Context context, AttributeSet attrs,
-			int defStyle) {
+	public ColoredSlipStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
@@ -122,26 +123,23 @@ public class ColoredSlipStickChart extends SlipStickChart {
 			return;
 		}
 
-		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber
-				- stickSpacing;
+		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
 		float stickX = dataQuadrant.getQuadrantPaddingStartX();
 
 		Paint mPaintStick = new Paint();
-		for (int i = displayFrom; i < displayFrom + displayNumber; i++) {
+
+		for (int i = displayFrom; i < displayFrom + dataSize; i++) {
 			ColoredStickEntity entity = (ColoredStickEntity) stickData.get(i);
 
-			float highY = (float) ((1f - (entity.getHigh() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
-			float lowY = (float) ((1f - (entity.getLow() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+			float highY = (float) ((1f - (entity.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
+			float lowY = (float) ((1f - (entity.getLow() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
 
 			mPaintStick.setColor(entity.getColor());
 			// stick or line?
 			if (stickWidth >= 2f) {
-				canvas.drawRect(stickX, highY, stickX + stickWidth, lowY,
-						mPaintStick);
+				canvas.drawRect(stickX, highY, stickX + stickWidth, lowY, mPaintStick);
 			} else {
 				canvas.drawLine(stickX, highY, stickX, lowY, mPaintStick);
 			}
@@ -164,5 +162,9 @@ public class ColoredSlipStickChart extends SlipStickChart {
 	 */
 	public void setColoredStickStyle(int coloredStickStyle) {
 		this.coloredStickStyle = coloredStickStyle;
+	}
+
+	public void setDisplayDataSize(int displayDataSize) {
+		this.dataSize = displayDataSize;
 	}
 }
