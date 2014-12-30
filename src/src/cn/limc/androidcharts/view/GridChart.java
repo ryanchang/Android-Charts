@@ -598,7 +598,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	private OnCrossDisplayListener crossDisplayListener;
 	// 是否需要两边都有文字
 	private boolean hasTitlesBothSides;
-	
+
 	public boolean isHasTitlesBothSides() {
 		return hasTitlesBothSides;
 	}
