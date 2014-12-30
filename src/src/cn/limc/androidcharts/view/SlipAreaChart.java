@@ -56,6 +56,7 @@ public class SlipAreaChart extends SlipLineChart {
 	private double maxChangPrice;
 	private int shadowAreaColor;
 
+
 	/**
 	 * <p>
 	 * Constructor of SlipAreaChart
@@ -157,6 +158,7 @@ public class SlipAreaChart extends SlipLineChart {
 			if (i == 1) {
 				return;
 			}
+
 			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
@@ -184,6 +186,7 @@ public class SlipAreaChart extends SlipLineChart {
 			}
 
 			Path linePath = new Path();
+
 			int count = 0;
 			float valueY = dataQuadrant.getQuadrantPaddingHeight() + dataQuadrant.getQuadrantPaddingStartY();
 			for (int j = displayFrom; j < displayFrom + lineData.size(); j++) {
@@ -208,6 +211,7 @@ public class SlipAreaChart extends SlipLineChart {
 				valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
 						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
 						+ dataQuadrant.getQuadrantPaddingStartY();
+
 				// if is not last point connect to previous point
 				if (j == displayFrom || count == 1) {
 					linePath.moveTo(startX, dataQuadrant.getQuadrantPaddingEndY());
@@ -237,11 +241,14 @@ public class SlipAreaChart extends SlipLineChart {
 	public void setClosingPrice(double closingPrice) {
 		super.setClosingPrice(closingPrice);
 		this.closingPrice = closingPrice;
+
 	}
 
 	public void setMaxChangPrice(float maxChangPrice) {
 		super.setMaxChangPrice(maxChangPrice);
 		this.maxChangPrice = maxChangPrice;
+
 	}
+
 
 }

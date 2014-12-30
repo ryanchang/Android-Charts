@@ -186,7 +186,9 @@ public abstract class AbstractBaseChart extends View implements IChart {
 		mPaint.setStrokeWidth(borderWidth);
 		mPaint.setStyle(Style.STROKE);
 		// draw a rectangle
+
 		//画出最外边的一个正方形边框
+
 		canvas.drawRect(borderWidth / 2, borderWidth / 2, super.getWidth() - borderWidth / 2, super.getHeight() - borderWidth / 2, mPaint);
 	}
 

@@ -177,6 +177,7 @@ public class ColoredSlipStickChart extends SlipStickChart {
 		this.dataSize = displayDataSize;
 	}
 
+
 	@Override
 	public double getTradeNumHigh(float value) {
 		float graduate = Float.valueOf(super.getAxisXGraduate(value));
@@ -185,4 +186,5 @@ public class ColoredSlipStickChart extends SlipStickChart {
 		Log.i("info", "SCCchart.tradeVolume=" + entity.getHigh());
 		return entity.getHigh();
 	}
+
 }
