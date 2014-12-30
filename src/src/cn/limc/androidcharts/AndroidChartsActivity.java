@@ -248,6 +248,8 @@ public class AndroidChartsActivity extends Activity {
 		List<LineEntity<DateValueEntity>> lines = new ArrayList<LineEntity<DateValueEntity>>();
 
 		// 计算5日均线
+		// LineEntity:表示线数据的实体.
+		// DateValueEntity: 表示一个线数据中的一个点的数据.
 		LineEntity<DateValueEntity> MA5 = new LineEntity<DateValueEntity>();
 		MA5.setTitle("HIGH");
 		MA5.setLineColor(Color.WHITE);
@@ -309,33 +311,48 @@ public class AndroidChartsActivity extends Activity {
 		MA10.setLineData(dv2);
 		lines.add(MA10);
 
+		// 设置xy轴的颜色
 		slipareachart.setAxisXColor(Color.LTGRAY);
 		slipareachart.setAxisYColor(Color.LTGRAY);
+		// 设置边界的颜色
 		slipareachart.setBorderColor(Color.LTGRAY);
+		// 经线的文字大小和颜色
 		slipareachart.setLongitudeFontSize(14);
 		slipareachart.setLongitudeFontColor(Color.WHITE);
+		// 纬线的文字的大小和颜色
 		slipareachart.setLatitudeColor(Color.GRAY);
 		slipareachart.setLatitudeFontColor(Color.WHITE);
+		// 设置经线的颜色
 		slipareachart.setLongitudeColor(Color.GRAY);
+		// 设置y轴的最大值和最小值
 		slipareachart.setMaxValue(1300);
 		slipareachart.setMinValue(700);
+		// 设置数据显示起始位置
 		slipareachart.setDisplayFrom(10);
+		// 设置显示数据
 		slipareachart.setDisplayNumber(30);
+		// 设置最低的显示数据的个数
 		slipareachart.setMinDisplayNumber(5);
+		// 设置缩放方式
 		slipareachart.setZoomBaseLine(IZoomable.ZOOM_BASE_LINE_CENTER);
+		// 显示经线名称
 		slipareachart.setDisplayLongitudeTitle(true);
+		// 设置纬线表示名称
 		slipareachart.setDisplayLatitudeTitle(true);
 		slipareachart.setDisplayLatitude(true);
 		slipareachart.setDisplayLongitude(true);
+		// 设置轴线上,下,左,右边距
 		slipareachart.setDataQuadrantPaddingTop(5);
 		slipareachart.setDataQuadrantPaddingBottom(5);
 		slipareachart.setDataQuadrantPaddingLeft(5);
 		slipareachart.setDataQuadrantPaddingRight(5);
+		// 设置
 		slipareachart.setAxisYTitleQuadrantWidth(50);
 		slipareachart.setAxisXTitleQuadrantHeight(20);
+		// 设置xy轴的位置
 		slipareachart.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
 		slipareachart.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
-
+		// 赋值
 		slipareachart.setLinesData(lines);
 	}
 
@@ -427,7 +444,6 @@ public class AndroidChartsActivity extends Activity {
 		stickchart.setAxisYDecimalFormat("#,##0.00");
 		stickchart.setAxisXDateTargetFormat("yyyy/MM/dd");
 		stickchart.setAxisXDateSourceFormat("yyyyMMdd");
-		
 
 		// 为chart1增加均线
 		stickchart.setStickData(new ListChartData<IStickEntity>(vol));
@@ -525,13 +541,11 @@ public class AndroidChartsActivity extends Activity {
 		coloredslipstickchart.setDataQuadrantPaddingRight(5);
 		coloredslipstickchart.setAxisYTitleQuadrantWidth(50);
 		coloredslipstickchart.setAxisXTitleQuadrantHeight(20);
-		coloredslipstickchart
-				.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
+		coloredslipstickchart.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
 		coloredslipstickchart.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
-		
+
 		// 为chart1增加均线
-		coloredslipstickchart
-				.setStickData(new ListChartData<IStickEntity>(volc));
+		coloredslipstickchart.setStickData(new ListChartData<IStickEntity>(volc));
 	}
 
 	private void initMAStickChart() {
@@ -894,8 +908,7 @@ public class AndroidChartsActivity extends Activity {
 		slipcandlestickchart.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
 
 		// 为chart2增加均线
-		slipcandlestickchart
-				.setStickData(new ListChartData<IStickEntity>(ohlc));
+		slipcandlestickchart.setStickData(new ListChartData<IStickEntity>(ohlc));
 	}
 
 	private void initMACandleStickChart() {
@@ -1027,65 +1040,78 @@ public class AndroidChartsActivity extends Activity {
 		maslipcandlestickchart.setDataQuadrantPaddingRight(5);
 		maslipcandlestickchart.setAxisYTitleQuadrantWidth(50);
 		maslipcandlestickchart.setAxisXTitleQuadrantHeight(20);
-		maslipcandlestickchart
-				.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
-		maslipcandlestickchart
-				.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
+		maslipcandlestickchart.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
+		maslipcandlestickchart.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
 
 		// 为chart2增加均线
 		maslipcandlestickchart.setLinesData(lines);
 
 		// 为chart2增加均线
-		maslipcandlestickchart.setStickData(new ListChartData<IStickEntity>(
-				ohlc));
+		maslipcandlestickchart.setStickData(new ListChartData<IStickEntity>(ohlc));
 
 		maslipcandlestickchart.setOnDisplayCursorListener(new IDisplayCursorListener() {
-			public void onCursorChanged(IDataCursor dataCursor, int displayFrom,
-					int displayNumber) {
+			public void onCursorChanged(IDataCursor dataCursor, int displayFrom, int displayNumber) {
 				bollmaslipcandlestickchart.setDisplayFrom(displayFrom);
 				bollmaslipcandlestickchart.setDisplayNumber(displayNumber);
 				bollmaslipcandlestickchart.postInvalidate();
 			}
 		});
 
-		maslipcandlestickchart.setOnTouchGestureListener(new OnTouchGestureListener(){
+		maslipcandlestickchart.setOnTouchGestureListener(new OnTouchGestureListener() {
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchDown(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchDown
+			 * (cn.limc.androidcharts.event.ITouchable,
+			 * android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchDown(ITouchable touchable, MotionEvent event) {
 				super.onTouchDown(touchable, event);
-				bollmaslipcandlestickchart.touchDown(new PointF(event.getX(),event.getY()));
+				bollmaslipcandlestickchart.touchDown(new PointF(event.getX(), event.getY()));
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchMoved(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchMoved
+			 * (cn.limc.androidcharts.event.ITouchable,
+			 * android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchMoved(ITouchable touchable, MotionEvent event) {
 				super.onTouchMoved(touchable, event);
-				bollmaslipcandlestickchart.touchMoved(new PointF(event.getX(),event.getY()));
+				bollmaslipcandlestickchart.touchMoved(new PointF(event.getX(), event.getY()));
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchUp(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchUp(
+			 * cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchUp(ITouchable touchable, MotionEvent event) {
 				super.onTouchUp(touchable, event);
-				bollmaslipcandlestickchart.touchUp(new PointF(event.getX(),event.getY()));
+				bollmaslipcandlestickchart.touchUp(new PointF(event.getX(), event.getY()));
 			}
-			
+
 		});
 	}
 
@@ -1150,8 +1176,7 @@ public class AndroidChartsActivity extends Activity {
 
 		bollmaslipcandlestickchart.setMinDisplayNumber(5);
 
-		bollmaslipcandlestickchart
-				.setZoomBaseLine(IZoomable.ZOOM_BASE_LINE_CENTER);
+		bollmaslipcandlestickchart.setZoomBaseLine(IZoomable.ZOOM_BASE_LINE_CENTER);
 
 		bollmaslipcandlestickchart.setDisplayLongitudeTitle(true);
 		bollmaslipcandlestickchart.setDisplayLatitudeTitle(true);
@@ -1165,64 +1190,77 @@ public class AndroidChartsActivity extends Activity {
 		bollmaslipcandlestickchart.setDataQuadrantPaddingRight(5);
 		bollmaslipcandlestickchart.setAxisYTitleQuadrantWidth(50);
 		bollmaslipcandlestickchart.setAxisXTitleQuadrantHeight(20);
-		bollmaslipcandlestickchart
-				.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
-		bollmaslipcandlestickchart
-				.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
+		bollmaslipcandlestickchart.setAxisXPosition(GridChart.AXIS_X_POSITION_BOTTOM);
+		bollmaslipcandlestickchart.setAxisYPosition(GridChart.AXIS_Y_POSITION_RIGHT);
 
 		// 为chart2增加均线
 		bollmaslipcandlestickchart.setLinesData(lines);
 		bollmaslipcandlestickchart.setBandData(band);
 
 		// 为chart2增加均线
-		bollmaslipcandlestickchart
-				.setStickData(new ListChartData<IStickEntity>(ohlc));
+		bollmaslipcandlestickchart.setStickData(new ListChartData<IStickEntity>(ohlc));
 
 		bollmaslipcandlestickchart.setOnDisplayCursorListener(new IDisplayCursorListener() {
-			public void onCursorChanged(IDataCursor dataCursor, int displayFrom,
-					int displayNumber) {
+			public void onCursorChanged(IDataCursor dataCursor, int displayFrom, int displayNumber) {
 				maslipcandlestickchart.setDisplayFrom(displayFrom);
 				maslipcandlestickchart.setDisplayNumber(displayNumber);
 				maslipcandlestickchart.postInvalidate();
 			}
 		});
 
-		bollmaslipcandlestickchart.setOnTouchGestureListener(new OnTouchGestureListener(){
+		bollmaslipcandlestickchart.setOnTouchGestureListener(new OnTouchGestureListener() {
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchDown(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchDown
+			 * (cn.limc.androidcharts.event.ITouchable,
+			 * android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchDown(ITouchable touchable, MotionEvent event) {
 				super.onTouchDown(touchable, event);
-				maslipcandlestickchart.touchDown(new PointF(event.getX(),event.getY()));
+				maslipcandlestickchart.touchDown(new PointF(event.getX(), event.getY()));
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchMoved(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchMoved
+			 * (cn.limc.androidcharts.event.ITouchable,
+			 * android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchMoved(ITouchable touchable, MotionEvent event) {
 				super.onTouchMoved(touchable, event);
-				maslipcandlestickchart.touchMoved(new PointF(event.getX(),event.getY()));
+				maslipcandlestickchart.touchMoved(new PointF(event.getX(), event.getY()));
 			}
 
-			/* (non-Javadoc)
+			/*
+			 * (non-Javadoc)
 			 * 
 			 * @param touchable
-			 * @param event 
-			 * @see cn.limc.androidcharts.event.OnTouchGestureListener#onTouchUp(cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent) 
+			 * 
+			 * @param event
+			 * 
+			 * @see
+			 * cn.limc.androidcharts.event.OnTouchGestureListener#onTouchUp(
+			 * cn.limc.androidcharts.event.ITouchable, android.view.MotionEvent)
 			 */
 			@Override
 			public void onTouchUp(ITouchable touchable, MotionEvent event) {
 				super.onTouchUp(touchable, event);
-				maslipcandlestickchart.touchUp(new PointF(event.getX(),event.getY()));
+				maslipcandlestickchart.touchUp(new PointF(event.getX(), event.getY()));
 			}
 		});
 
@@ -1231,69 +1269,42 @@ public class AndroidChartsActivity extends Activity {
 	private void initPieChart() {
 		this.piechart = (PieChart) findViewById(R.id.piechart);
 		List<TitleValueColorEntity> data3 = new ArrayList<TitleValueColorEntity>();
-		data3.add(new TitleValueColorEntity(getResources().getString(
-				R.string.piechart_title1), 2, getResources().getColor(
-				R.drawable.red)));
-		data3.add(new TitleValueColorEntity(getResources().getString(
-				R.string.piechart_title2), 3, getResources().getColor(
-				R.drawable.orange)));
-		data3.add(new TitleValueColorEntity(getResources().getString(
-				R.string.piechart_title3), 6, getResources().getColor(
-				R.drawable.yellow)));
-		data3.add(new TitleValueColorEntity(getResources().getString(
-				R.string.piechart_title4), 2, getResources().getColor(
-				R.drawable.lightgreen)));
-		data3.add(new TitleValueColorEntity(getResources().getString(
-				R.string.piechart_title5), 2, getResources().getColor(
-				R.drawable.green)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.piechart_title1), 2, getResources().getColor(R.drawable.red)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.piechart_title2), 3, getResources().getColor(R.drawable.orange)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.piechart_title3), 6, getResources().getColor(R.drawable.yellow)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.piechart_title4), 2, getResources().getColor(R.drawable.lightgreen)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.piechart_title5), 2, getResources().getColor(R.drawable.green)));
 		piechart.setData(data3);
 	}
-	
-    private void initRoseChart() {
-        this.rosechart = (RoseChart) findViewById(R.id.rosechart);
-        List<TitleValueColorEntity> data3 = new ArrayList<TitleValueColorEntity>();
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 1,
-                getResources().getColor(R.drawable.red)));
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 2,
-                getResources().getColor(R.drawable.orange)));
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 3,
-                getResources().getColor(R.drawable.yellow)));
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title4), 4,
-                getResources().getColor(R.drawable.green)));
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title5), 5,
-                getResources().getColor(R.drawable.blue)));
-        data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title6), 6,
-                getResources().getColor(R.drawable.pink)));
-        rosechart.setData(data3);
-    }
 
+	private void initRoseChart() {
+		this.rosechart = (RoseChart) findViewById(R.id.rosechart);
+		List<TitleValueColorEntity> data3 = new ArrayList<TitleValueColorEntity>();
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 1, getResources().getColor(R.drawable.red)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 2, getResources().getColor(R.drawable.orange)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title1), 3, getResources().getColor(R.drawable.yellow)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title4), 4, getResources().getColor(R.drawable.green)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title5), 5, getResources().getColor(R.drawable.blue)));
+		data3.add(new TitleValueColorEntity(getResources().getString(R.string.rosechart_title6), 6, getResources().getColor(R.drawable.pink)));
+		rosechart.setData(data3);
+	}
 
 	private void initSpiderWebChart() {
 		this.spiderwebchart = (SpiderWebChart) findViewById(R.id.spiderwebchart);
 
 		List<TitleValueEntity> data1 = new ArrayList<TitleValueEntity>();
-		data1.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title1), 3));
-		data1.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title2), 4));
-		data1.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title3), 9));
-		data1.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title4), 8));
-		data1.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 10));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title1), 3));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title2), 4));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title3), 9));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title4), 8));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 10));
 
 		List<TitleValueEntity> data2 = new ArrayList<TitleValueEntity>();
-		data2.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 3));
-		data2.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 4));
-		data2.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 5));
-		data2.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 6));
-		data2.add(new TitleValueEntity(getResources().getString(
-				R.string.spiderwebchart_title5), 7));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 3));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 4));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 5));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 6));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.spiderwebchart_title5), 7));
 
 		List<List<TitleValueEntity>> data = new ArrayList<List<TitleValueEntity>>();
 		data.add(data1);
@@ -1302,41 +1313,31 @@ public class AndroidChartsActivity extends Activity {
 		spiderwebchart.setData(data);
 		spiderwebchart.setLatitudeNum(5);
 	}
-	
-	   private void initRadarChart() {
-	        this.radarchart = (RadarChart) findViewById(R.id.radarchart);
 
-	        List<TitleValueEntity> data1 = new ArrayList<TitleValueEntity>();
-	        data1.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title1), 3));
-	        data1.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title2), 4));
-	        data1.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title3), 9));
-	        data1.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title4), 8));
-	        data1.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title5), 10));
+	private void initRadarChart() {
+		this.radarchart = (RadarChart) findViewById(R.id.radarchart);
 
-	        List<TitleValueEntity> data2 = new ArrayList<TitleValueEntity>();
-	        data2.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title1), 3));
-	        data2.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title2), 4));
-	        data2.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title3), 5));
-	        data2.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title4), 6));
-	        data2.add(new TitleValueEntity(getResources().getString(
-	                R.string.radarchart_title5), 7));
+		List<TitleValueEntity> data1 = new ArrayList<TitleValueEntity>();
+		data1.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title1), 3));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title2), 4));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title3), 9));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title4), 8));
+		data1.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title5), 10));
 
-	        List<List<TitleValueEntity>> data = new ArrayList<List<TitleValueEntity>>();
-	        data.add(data1);
-	        data.add(data2);
+		List<TitleValueEntity> data2 = new ArrayList<TitleValueEntity>();
+		data2.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title1), 3));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title2), 4));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title3), 5));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title4), 6));
+		data2.add(new TitleValueEntity(getResources().getString(R.string.radarchart_title5), 7));
 
-	        radarchart.setData(data);
-	        radarchart.setLatitudeNum(5);
-	    }
+		List<List<TitleValueEntity>> data = new ArrayList<List<TitleValueEntity>>();
+		data.add(data1);
+		data.add(data2);
+
+		radarchart.setData(data);
+		radarchart.setLatitudeNum(5);
+	}
 
 	private void initMACDChart() {
 
@@ -1623,7 +1624,7 @@ public class AndroidChartsActivity extends Activity {
 				sum = sum + close - (float) vol.get(i - days).getHigh();
 				avg = sum / days;
 			}
-			MA5Values.add(new DateValueEntity(avg, vol.get(i).getDate()));
+			MA5Values.add(new DateValueEntity(avg, (int) vol.get(i).getDate()));
 		}
 
 		return MA5Values;
@@ -2059,11 +2060,10 @@ public class AndroidChartsActivity extends Activity {
 				sum = sum + close;
 				avg = sum / (i + 1f);
 			} else {
-				sum = sum + close
-						- (float) ((OHLCEntity) ohlc.get(i - days)).getClose();
+				sum = sum + close - (float) ((OHLCEntity) ohlc.get(i - days)).getClose();
 				avg = sum / days;
 			}
-			MA5Values.add(new DateValueEntity(avg, ohlc.get(i).getDate()));
+			MA5Values.add(new DateValueEntity(avg, (int) ohlc.get(i).getDate()));
 		}
 
 		return MA5Values;

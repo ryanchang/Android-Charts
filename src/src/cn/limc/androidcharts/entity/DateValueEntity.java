@@ -90,4 +90,10 @@ public class DateValueEntity implements IHasDate {
 	public void setValue(float value) {
 		this.value = value;
 	}
+
+	@Override
+	public String toString() {
+		return "DateValueEntity [date=" + date + ", value=" + value + "]";
+	}
+
 }

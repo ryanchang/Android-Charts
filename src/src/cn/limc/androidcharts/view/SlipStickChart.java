@@ -32,6 +32,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -60,7 +61,7 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	protected int displayNumber = DEFAULT_DISPLAY_NUMBER;
 	protected int minDisplayNumber = DEFAULT_MIN_DISPLAY_NUMBER;
 	protected int zoomBaseLine = DEFAULT_ZOOM_BASE_LINE;
-	
+
 	protected OnSlipGestureListener onSlipGestureListener = new OnSlipGestureListener();
 	protected IGestureDetector slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
 
@@ -144,15 +145,14 @@ public class SlipStickChart extends StickChart implements ISlipable {
 			return;
 		}
 
-		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber()
-				- stickSpacing;
+		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber() - stickSpacing;
 		float stickX = dataQuadrant.getQuadrantPaddingStartX();
 
 		for (int i = getDisplayFrom(); i < getDisplayTo(); i++) {
 			IMeasurable stick = stickData.get(i);
-			
-			StickMole mole = (StickMole)provider.getMole();
-			mole.setUp(this,stick,stickX,stickWidth);
+
+			StickMole mole = (StickMole) provider.getMole();
+			mole.setUp(this, stick, stickX, stickWidth);
 			mole.draw(canvas);
 
 			// next x
@@ -166,13 +166,16 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	protected PointF startPointA;
 	protected PointF startPointB;
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @param event
-	 * @return 
-	 * @see cn.limc.androidcharts.view.StickChart#onTouchEvent(android.view.MotionEvent)
+	 * 
+	 * @return
+	 * 
+	 * @see
+	 * cn.limc.androidcharts.view.StickChart#onTouchEvent(android.view.MotionEvent
+	 * )
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -186,9 +189,10 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
-	/* (non-Javadoc)
-	 *  
-	 * @see cn.limc.androidcharts.common.ISlipable#moveRight() 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see cn.limc.androidcharts.common.ISlipable#moveRight()
 	 */
 	public void moveRight() {
 		int dataSize = stickData.size();
@@ -202,18 +206,19 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (getDisplayTo() >= dataSize) {
 			setDisplayFrom(dataSize - getDisplayNumber());
 		}
-		
+
 		this.postInvalidate();
 
-		//Listener
+		// Listener
 		if (onDisplayCursorListener != null) {
-			onDisplayCursorListener.onCursorChanged(this,getDisplayFrom(), getDisplayNumber());
+			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 		}
 	}
 
-	/* (non-Javadoc)
-	 *  
-	 * @see cn.limc.androidcharts.common.ISlipable#moveLeft() 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see cn.limc.androidcharts.common.ISlipable#moveLeft()
 	 */
 	public void moveLeft() {
 		int dataSize = stickData.size();
@@ -230,18 +235,18 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (getDisplayTo() >= dataSize) {
 			setDisplayFrom(dataSize - getDisplayNumber());
 		}
-		
+
 		this.postInvalidate();
 
-		//Listener
+		// Listener
 		if (onDisplayCursorListener != null) {
-			onDisplayCursorListener.onCursorChanged(this,getDisplayFrom(), getDisplayNumber());
+			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 *  
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#zoomIn()
 	 */
 	@Override
@@ -267,20 +272,19 @@ public class SlipStickChart extends StickChart implements ISlipable {
 			if (getDisplayTo() >= stickData.size()) {
 				setDisplayFrom(stickData.size() - getDisplayNumber());
 			}
-			
+
 			this.postInvalidate();
 
-			//Listener
+			// Listener
 			if (onDisplayCursorListener != null) {
-				onDisplayCursorListener.onCursorChanged(this,getDisplayFrom(), getDisplayNumber());
+				onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 			}
 		}
 	}
 
-
 	/*
 	 * (non-Javadoc)
-	 *  
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#zoomOut()
 	 */
 	@Override
@@ -315,19 +319,19 @@ public class SlipStickChart extends StickChart implements ISlipable {
 			}
 
 			this.postInvalidate();
-			
-			//Listener
+
+			// Listener
 			if (onDisplayCursorListener != null) {
-				onDisplayCursorListener.onCursorChanged(this,getDisplayFrom(), getDisplayNumber());
+				onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 			}
 		}
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @return 
+	 * @return
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#getDisplayFrom()
 	 */
 	@Override
@@ -335,11 +339,11 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		return displayFrom;
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param displayFrom 
+	 * @param displayFrom
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#setDisplayFrom(int)
 	 */
 	@Override
@@ -347,11 +351,11 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		this.displayFrom = displayFrom;
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @return 
+	 * @return
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#getDisplayTo()
 	 */
 	@Override
@@ -362,7 +366,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param displayTo 
+	 * @param displayTo
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#setDisplayTo(int)
 	 */
 	@Override
@@ -373,7 +378,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @return 
+	 * @return
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#getDisplayNumber()
 	 */
 	@Override
@@ -384,7 +390,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param displayNumber 
+	 * @param displayNumber
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#setDisplayNumber(int)
 	 */
 	@Override
@@ -395,7 +402,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @return 
+	 * @return
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#getMinDisplayNumber()
 	 */
 	@Override
@@ -406,7 +414,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @param minDisplayNumber 
+	 * @param minDisplayNumber
+	 * 
 	 * @see cn.limc.androidcharts.view.StickChart#setMinDisplayNumber(int)
 	 */
 	@Override
@@ -414,7 +423,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		this.minDisplayNumber = minDisplayNumber;
 	}
 
-	
 	/**
 	 * @return the zoomBaseLine
 	 */
@@ -430,22 +438,28 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		this.zoomBaseLine = zoomBaseLine;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param listener 
-	 * @see cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc.androidcharts.event.OnSlipGestureListener) 
+	 * @param listener
+	 * 
+	 * @see
+	 * cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc
+	 * .androidcharts.event.OnSlipGestureListener)
 	 */
 	public void setOnSlipGestureListener(OnSlipGestureListener listener) {
 		this.onSlipGestureListener = listener;
-		
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return 
-	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener() 
+	 * @return
+	 * 
+	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener()
 	 */
 	public OnSlipGestureListener getOnSlipGestureListener() {
-		 return onSlipGestureListener;
-	}	
+		return onSlipGestureListener;
+	}
 }

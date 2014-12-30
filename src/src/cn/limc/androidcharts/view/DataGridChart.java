@@ -19,7 +19,6 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.view;
 
 import java.text.DecimalFormat;
@@ -36,30 +35,36 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/06/18 15:38:33 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/06/18 15:38:33
+ * 
  */
 public abstract class DataGridChart extends GridChart implements IDataCursor {
-	
+
 	public static final boolean DEFAULT_AUTO_CALC_VALUE_RANGE = true;
-	
+
 	public static final int DEFAULT_DATA_MULTIPLE = 1;
 	public static final String DEFAULT_AXIS_Y_DECIMAL_FORMAT = "#,##0";
 	public static final String DEFAULT_AXIS_X_DATE_TARGET_FORMAT = "yyyy/MM/dd";
 	public static final String DEFAULT_AXIS_X_DATE_SOURCE_FORMAT = "yyyyMMdd";
-	
-	protected int dataMultiple =  DEFAULT_DATA_MULTIPLE;
-	
+
+	protected int dataMultiple = DEFAULT_DATA_MULTIPLE;
+
 	protected String axisYDecimalFormat = DEFAULT_AXIS_Y_DECIMAL_FORMAT;
 	protected String axisXDateTargetFormat = DEFAULT_AXIS_X_DATE_TARGET_FORMAT;
 	protected String axisXDateSourceFormat = DEFAULT_AXIS_X_DATE_SOURCE_FORMAT;
-	
+
 	/**
 	 * <p>
 	 * max value of Y axis
@@ -87,15 +92,14 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	protected double minValue;
 
 	protected boolean autoCalcValueRange = DEFAULT_AUTO_CALC_VALUE_RANGE;
-	
-	
+
 	protected void calcDataValueRange() {
 		double maxValue = Double.MIN_VALUE;
 		double minValue = Double.MAX_VALUE;
 		IMeasurable first = this.stickData.get(getDisplayFrom());
 		// 第一个stick为停盘的情况
 		if (first.getHigh() == 0 && first.getLow() == 0) {
-
+			this.maxValue = 0;
 		} else {
 			maxValue = first.getHigh();
 			minValue = first.getLow();
@@ -104,7 +108,7 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		for (int i = getDisplayFrom(); i < getDisplayTo(); i++) {
 			IMeasurable stick;
 			stick = this.stickData.get(i);
-			
+
 			if (stick.getLow() < minValue) {
 				minValue = stick.getLow();
 			}
@@ -124,16 +128,18 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		double minValue = this.minValue;
 
 		if ((long) maxValue > (long) minValue) {
-			if ((maxValue - minValue) < 10 && minValue > 1) {
-				this.maxValue = (long) (maxValue + 1);
-				this.minValue = (long) (minValue - 1);
-			} else {
-				this.maxValue = (long) (maxValue + (maxValue - minValue) * 0.1);
-				this.minValue = (long) (minValue - (maxValue - minValue) * 0.1);
-				if (this.minValue < 0) {
-					this.minValue = 0;
-				}
-			}
+			// if ((maxValue - minValue) < 10 && minValue > 1) {
+			// this.maxValue = (long) (maxValue + 1);
+			// this.minValue = (long) (minValue - 1);
+			// } else {
+			// this.maxValue = (long) (maxValue + (maxValue - minValue) * 0.1);
+			// this.minValue = (long) (minValue - (maxValue - minValue) * 0.1);
+			// if (this.minValue < 0) {
+			// this.minValue = 0;
+			// }
+			// }
+			this.maxValue = maxValue;
+			this.minValue = minValue;
 		} else if ((long) maxValue == (long) minValue) {
 			if (maxValue <= 10 && maxValue > 1) {
 				this.maxValue = maxValue + 1;
@@ -182,19 +188,15 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 			rate = 1;
 		}
 		// 等分轴修正
-		if (this.latitudeNum > 0
-				&& (long) (this.maxValue - this.minValue)
-						% (this.latitudeNum * rate) != 0) {
+		if (this.latitudeNum > 0 && (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate) != 0) {
 			// 最大值加上轴差
-			this.maxValue = (long) this.maxValue
-					+ (this.latitudeNum * rate)
-					- ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
+			this.maxValue = (long) this.maxValue + (this.latitudeNum * rate) - ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
 		}
 	}
 
 	protected void calcValueRange() {
 		if (this.stickData != null && this.stickData.size() > 0) {
-			this.calcDataValueRange();
+			// this.calcDataValueRange();
 			this.calcValueRangePaddingZero();
 		} else {
 			this.maxValue = 0;
@@ -202,8 +204,7 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		}
 		this.calcValueRangeFormatForAxis();
 	}
-	
-	
+
 	/**
 	 * <p>
 	 * data to draw sticks
@@ -216,52 +217,69 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	 * </p>
 	 */
 	protected IChartData<IStickEntity> stickData;
-	
-//	protected IDataCursor dataCursor = this;
-	
-	/** 
-	 * <p>Constructor of DataGridChart</p>
-	 * <p>DataGridChart类对象的构造函数</p>
-	 * <p>DataGridChartのコンストラクター</p>
-	 *
-	 * @param context 
+
+	// protected IDataCursor dataCursor = this;
+
+	/**
+	 * <p>
+	 * Constructor of DataGridChart
+	 * </p>
+	 * <p>
+	 * DataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * DataGridChartのコンストラクター
+	 * </p>
+	 * 
+	 * @param context
 	 */
 	public DataGridChart(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
 
-	/** 
-	 * <p>Constructor of DataGridChart</p>
-	 * <p>DataGridChart类对象的构造函数</p>
-	 * <p>DataGridChartのコンストラクター</p>
-	 *
+	/**
+	 * <p>
+	 * Constructor of DataGridChart
+	 * </p>
+	 * <p>
+	 * DataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * DataGridChartのコンストラクター
+	 * </p>
+	 * 
 	 * @param context
 	 * @param attrs
-	 * @param defStyle 
+	 * @param defStyle
 	 */
 	public DataGridChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
 
-	/** 
-	 * <p>Constructor of DataGridChart</p>
-	 * <p>DataGridChart类对象的构造函数</p>
-	 * <p>DataGridChartのコンストラクター</p>
-	 *
+	/**
+	 * <p>
+	 * Constructor of DataGridChart
+	 * </p>
+	 * <p>
+	 * DataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * DataGridChartのコンストラクター
+	 * </p>
+	 * 
 	 * @param context
-	 * @param attrs 
+	 * @param attrs
 	 */
 	public DataGridChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		// TODO Auto-generated constructor stub
 	}
-	
-	protected void onDraw(Canvas canvas) {		
+
+	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -295,12 +313,11 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		float graduate = Float.valueOf(super.getAxisYGraduate(value));
 		return formatAxisYDegree(graduate * (maxValue - minValue) + minValue);
 	}
-	
-	
+
 	public String formatAxisYDegree(double value) {
-		return new DecimalFormat(axisYDecimalFormat).format(Math.floor(value)/dataMultiple);
+		return new DecimalFormat(axisYDecimalFormat).format(Math.floor(value) / dataMultiple);
 	}
-	
+
 	public String formatAxisXDegree(int date) {
 		try {
 			Date dt = new SimpleDateFormat(axisXDateSourceFormat).parse(String.valueOf(date));
@@ -309,7 +326,7 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 			return "";
 		}
 	}
-	
+
 	/**
 	 * <p>
 	 * get current selected data index
@@ -338,9 +355,9 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		}
 		return calcSelectedIndex(touchPoint.x, touchPoint.y);
 	}
-	
-	protected int calcSelectedIndex(float x ,float y) {
-		if (!isValidTouchPoint(x,y)) {
+
+	protected int calcSelectedIndex(float x, float y) {
+		if (!isValidTouchPoint(x, y)) {
 			return 0;
 		}
 		float graduate = Float.valueOf(super.getAxisXGraduate(x));
@@ -351,10 +368,10 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		} else if (index < 0) {
 			index = 0;
 		}
-		
+
 		return getDisplayFrom() + index;
-	}	
-	
+	}
+
 	/**
 	 * @return the dataMultiple
 	 */
@@ -363,7 +380,8 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	}
 
 	/**
-	 * @param dataMultiple the dataMultiple to set
+	 * @param dataMultiple
+	 *            the dataMultiple to set
 	 */
 	public void setDataMultiple(int dataMultiple) {
 		this.dataMultiple = dataMultiple;
@@ -377,7 +395,8 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	}
 
 	/**
-	 * @param axisYDecimalFormat the axisYDecimalFormat to set
+	 * @param axisYDecimalFormat
+	 *            the axisYDecimalFormat to set
 	 */
 	public void setAxisYDecimalFormat(String axisYDecimalFormat) {
 		this.axisYDecimalFormat = axisYDecimalFormat;
@@ -391,7 +410,8 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	}
 
 	/**
-	 * @param axisXDateTargetFormat the axisXDateTargetFormat to set
+	 * @param axisXDateTargetFormat
+	 *            the axisXDateTargetFormat to set
 	 */
 	public void setAxisXDateTargetFormat(String axisXDateTargetFormat) {
 		this.axisXDateTargetFormat = axisXDateTargetFormat;
@@ -405,12 +425,13 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	}
 
 	/**
-	 * @param axisXDateSourceFormat the axisXDateSourceFormat to set
+	 * @param axisXDateSourceFormat
+	 *            the axisXDateSourceFormat to set
 	 */
 	public void setAxisXDateSourceFormat(String axisXDateSourceFormat) {
 		this.axisXDateSourceFormat = axisXDateSourceFormat;
 	}
-	
+
 	/**
 	 * @return the maxValue
 	 */

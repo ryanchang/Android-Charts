@@ -302,4 +302,16 @@ public class RoundChart extends AbstractBaseChart {
         this.displayLongitude = displayRadius;
     }
 
+	@Override
+	public void setClosingPrice(double closingPrice) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setMaxChangPrice(float maxChangPrice) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

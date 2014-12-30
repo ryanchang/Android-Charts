@@ -42,10 +42,10 @@ import android.view.MotionEvent;
 public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetector<IZoomable> {
 	protected PointF startPointA;
 	protected PointF startPointB;
-	
+
 	private OnSlipGestureListener onSlipGestureListener;
 
-	public SlipGestureDetector(ISlipable slipable){
+	public SlipGestureDetector(ISlipable slipable) {
 		super(slipable);
 		if (slipable != null) {
 			this.onSlipGestureListener = slipable.getOnSlipGestureListener();
@@ -83,28 +83,26 @@ public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetecto
 				startPointB = new PointF(event.getX(1), event.getY(1));
 			}
 			return true;
-			//break;
+			// break;
 		case MotionEvent.ACTION_MOVE:
 			if (touchMode == TOUCH_MODE_MULTI) {
 				newdistance = calcDistance(event);
 				if (newdistance > MIN_DISTANCE) {
-					if (startPointA.x >= event.getX(0)
-							&& startPointB.x >= event.getX(1)) {
+					if (startPointA.x >= event.getX(0) && startPointB.x >= event.getX(1)) {
 						if (onSlipGestureListener != null) {
-							onSlipGestureListener.onMoveRight((ISlipable)instance,event);
+							onSlipGestureListener.onMoveRight((ISlipable) instance, event);
 						}
-					} else if (startPointA.x <= event.getX(0)
-							&& startPointB.x <= event.getX(1)) {
+					} else if (startPointA.x <= event.getX(0) && startPointB.x <= event.getX(1)) {
 						if (onSlipGestureListener != null) {
-							onSlipGestureListener.onMoveLeft((ISlipable)instance,event);
+							onSlipGestureListener.onMoveLeft((ISlipable) instance, event);
 						}
 					} else {
 						if (Math.abs(newdistance - olddistance) > MIN_DISTANCE) {
 							if (onZoomGestureListener != null) {
 								if (newdistance > olddistance) {
-									onZoomGestureListener.onZoomIn((IZoomable)instance,event);
+									onZoomGestureListener.onZoomIn((IZoomable) instance, event);
 								} else {
-									onZoomGestureListener.onZoomOut((IZoomable)instance,event);
+									onZoomGestureListener.onZoomOut((IZoomable) instance, event);
 								}
 							}
 							// reset distance

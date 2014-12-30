@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:scrollbars="none">
+    android:scrollbars="none" >
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
             android:id="@+id/linechart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             android:id="@+id/sliplinechart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:id="@+id/slipareachart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             android:id="@+id/stickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
             android:id="@+id/slipstickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
             android:id="@+id/mastickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -118,7 +118,7 @@
             android:id="@+id/minusstickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -138,7 +138,7 @@
             android:id="@+id/candlestickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -158,7 +158,7 @@
             android:id="@+id/macandlestickchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -173,7 +173,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/bollmaslipcandlestickchart" />
-        
+
         <cn.limc.androidcharts.view.BOLLMASlipCandleStickChart
             android:id="@+id/bollmaslipcandlestickchart"
             android:layout_width="fill_parent"
@@ -183,11 +183,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/macdchart" />
-        
+
         <cn.limc.androidcharts.view.MACDChart
             android:id="@+id/macdchart"
             android:layout_width="fill_parent"
-            android:layout_height="240dip"/>
+            android:layout_height="240dip" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -198,7 +198,7 @@
             android:id="@+id/piechart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -218,7 +218,7 @@
             android:id="@+id/spiderwebchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
+
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -228,7 +228,6 @@
             android:id="@+id/radarchart"
             android:layout_width="fill_parent"
             android:layout_height="240dip" />
-        
     </LinearLayout>
 
 </ScrollView>

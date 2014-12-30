@@ -23,6 +23,8 @@ package cn.limc.androidcharts.view;
 
 import java.util.List;
 
+import org.apache.http.util.LangUtils;
+
 import cn.limc.androidcharts.entity.DateValueEntity;
 import cn.limc.androidcharts.entity.LineEntity;
 import android.content.Context;
@@ -30,6 +32,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 
 /**
  * <p>
@@ -47,6 +50,11 @@ import android.util.AttributeSet;
  * 
  */
 public class SlipAreaChart extends SlipLineChart {
+
+	private double closingPrice;
+	private int displayDataSize;
+	private double maxChangPrice;
+	private int shadowAreaColor;
 
 	/**
 	 * <p>
@@ -146,8 +154,10 @@ public class SlipAreaChart extends SlipLineChart {
 
 		// draw lines
 		for (int i = 0; i < linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			if (i == 1) {
+				return;
+			}
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -160,41 +170,78 @@ public class SlipAreaChart extends SlipLineChart {
 			}
 
 			Paint mPaint = new Paint();
-			mPaint.setColor(line.getLineColor());
+			mPaint.setColor(line.getShadowAreaColor());
 			mPaint.setAlpha(70);
 			mPaint.setAntiAlias(true);
 
 			// set start point’s X
 			if (lineAlignType == ALIGN_TYPE_CENTER) {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
-                startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-            }else {
-                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
-                startX = dataQuadrant.getQuadrantPaddingStartX();
-            }
-			
-			Path linePath = new Path();
-			for (int j = displayFrom; j < displayFrom + displayNumber; j++) {
-				float value = lineData.get(j).getValue();
-				// calculate Y
-				float valueY = (float) ((1f - (value - minValue)
-						/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
-						+ dataQuadrant.getQuadrantPaddingStartY();
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
+				startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+			} else {
+				lineLength = (dataQuadrant.getQuadrantPaddingWidth() / (displayNumber - 1));
+				startX = dataQuadrant.getQuadrantPaddingStartX();
+			}
 
+			Path linePath = new Path();
+			int count = 0;
+			float valueY = dataQuadrant.getQuadrantPaddingHeight() + dataQuadrant.getQuadrantPaddingStartY();
+			for (int j = displayFrom; j < displayFrom + lineData.size(); j++) {
+				if (lineData.get(j) == null) {
+					startX = startX + lineLength;
+					linePath.lineTo(startX, valueY);
+					continue;
+				}
+				float value = lineData.get(j).getValue();
+				if (value == 0) {
+					if (j == 0) {
+						linePath.moveTo(startX, dataQuadrant.getQuadrantPaddingEndY());
+						linePath.lineTo(startX, valueY);
+						startX = startX + lineLength;
+					} else {
+						startX = startX + lineLength;
+						linePath.lineTo(startX, valueY);
+					}
+					continue;
+				}
+				count++;
+				valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
+						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
+						+ dataQuadrant.getQuadrantPaddingStartY();
 				// if is not last point connect to previous point
-				if (j == displayFrom) {
+				if (j == displayFrom || count == 1) {
 					linePath.moveTo(startX, dataQuadrant.getQuadrantPaddingEndY());
 					linePath.lineTo(startX, valueY);
-				} else if (j == displayFrom + displayNumber - 1) {
+				} else if (j == displayFrom + displayDataSize - 1) {
 					linePath.lineTo(startX, valueY);
+					// getQuadrantPaddingEndY 表示
 					linePath.lineTo(startX, dataQuadrant.getQuadrantPaddingEndY());
 				} else {
 					linePath.lineTo(startX, valueY);
 				}
 				startX = startX + lineLength;
 			}
+			// linePath.lineTo(startX, valueY);
+			// getQuadrantPaddingEndY 表示
+			linePath.lineTo(startX, dataQuadrant.getQuadrantPaddingEndY());
 			linePath.close();
 			canvas.drawPath(linePath, mPaint);
 		}
 	}
+
+	public void setDisplayDataSizeInChild(int dataSize) {
+		this.displayDataSize = dataSize;
+		super.setDisplayDataSize(dataSize);
+	}
+
+	public void setClosingPrice(double closingPrice) {
+		super.setClosingPrice(closingPrice);
+		this.closingPrice = closingPrice;
+	}
+
+	public void setMaxChangPrice(float maxChangPrice) {
+		super.setMaxChangPrice(maxChangPrice);
+		this.maxChangPrice = maxChangPrice;
+	}
+
 }

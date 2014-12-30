@@ -29,6 +29,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Paint.Style;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -49,7 +50,7 @@ import android.view.View;
 public abstract class AbstractBaseChart extends View implements IChart {
 
 	public static final String LOG_TAG = "AbstractBaseChart";
-	
+
 	/**
 	 * <p>
 	 * default background color
@@ -62,7 +63,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	 * </p>
 	 */
 	public static final int DEFAULT_BACKGROUND_COLOR = Color.BLACK;
-	
+
 	/**
 	 * <p>
 	 * Should display the border?
@@ -87,10 +88,10 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	 * 默认经线刻度字体颜色
 	 * </p>
 	 */
-	public static final int DEFAULT_BORDER_COLOR = Color.RED;
+	public static final int DEFAULT_BORDER_COLOR = Color.LTGRAY;
 
 	public static final float DEFAULT_BORDER_WIDTH = 1f;
-	
+
 	/**
 	 * <p>
 	 * Should display the border?
@@ -157,7 +158,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	public AbstractBaseChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
-	
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -165,7 +166,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 			drawBorder(canvas);
 		}
 	}
-	
+
 	/**
 	 * <p>
 	 * draw border
@@ -185,8 +186,8 @@ public abstract class AbstractBaseChart extends View implements IChart {
 		mPaint.setStrokeWidth(borderWidth);
 		mPaint.setStyle(Style.STROKE);
 		// draw a rectangle
-		canvas.drawRect(borderWidth / 2, borderWidth / 2, super.getWidth()
-				- borderWidth / 2, super.getHeight() - borderWidth / 2, mPaint);
+		//画出最外边的一个正方形边框
+		canvas.drawRect(borderWidth / 2, borderWidth / 2, super.getWidth() - borderWidth / 2, super.getHeight() - borderWidth / 2, mPaint);
 	}
 
 	/*
@@ -202,8 +203,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		setMeasuredDimension(measureWidth(widthMeasureSpec),
-				measureHeight(heightMeasureSpec));
+		setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
 	}
 
 	/*
@@ -219,8 +219,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	 * android.graphics.Rect)
 	 */
 	@Override
-	protected void onFocusChanged(boolean gainFocus, int direction,
-			Rect previouslyFocusedRect) {
+	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect) {
 		super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
 	}
 
@@ -286,8 +285,7 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	// return 0;
 	// }
 	// }
-	
-	
+
 	/**
 	 * @return the displayBorder
 	 */
@@ -332,4 +330,8 @@ public abstract class AbstractBaseChart extends View implements IChart {
 	public void setBorderWidth(float borderWidth) {
 		this.borderWidth = borderWidth;
 	}
+
+	public abstract void setClosingPrice(double closingPrice);
+
+	public abstract void setMaxChangPrice(float maxChangPrice);
 }

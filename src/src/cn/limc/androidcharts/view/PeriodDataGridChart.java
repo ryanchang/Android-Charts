@@ -19,7 +19,6 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.view;
 
 import java.util.ArrayList;
@@ -31,65 +30,89 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.MotionEvent;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/06/19 14:44:11 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/06/19 14:44:11
+ * 
  */
 public abstract class PeriodDataGridChart extends DataGridChart {
-	
 
 	public static final int DEFAULT_ALIGN_TYPE = ALIGN_TYPE_CENTER;
 	public static final int DEFAULT_BIND_CROSS_LINES_TO_STICK = BIND_TO_TYPE_BOTH;
-	
+
 	protected int gridAlignType = DEFAULT_ALIGN_TYPE;
 	protected int bindCrossLinesToStick = DEFAULT_BIND_CROSS_LINES_TO_STICK;
 
-	/** 
-	 * <p>Constructor of PeriodDataGridChart</p>
-	 * <p>PeriodDataGridChart类对象的构造函数</p>
-	 * <p>PeriodDataGridChartのコンストラクター</p>
-	 *
-	 * @param context 
+	/**
+	 * <p>
+	 * Constructor of PeriodDataGridChart
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChartのコンストラクター
+	 * </p>
+	 * 
+	 * @param context
 	 */
 	public PeriodDataGridChart(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
 
-	/** 
-	 * <p>Constructor of PeriodDataGridChart</p>
-	 * <p>PeriodDataGridChart类对象的构造函数</p>
-	 * <p>PeriodDataGridChartのコンストラクター</p>
-	 *
+	/**
+	 * <p>
+	 * Constructor of PeriodDataGridChart
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChartのコンストラクター
+	 * </p>
+	 * 
 	 * @param context
 	 * @param attrs
-	 * @param defStyle 
+	 * @param defStyle
 	 */
 	public PeriodDataGridChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
 
-	/** 
-	 * <p>Constructor of PeriodDataGridChart</p>
-	 * <p>PeriodDataGridChart类对象的构造函数</p>
-	 * <p>PeriodDataGridChartのコンストラクター</p>
-	 *
+	/**
+	 * <p>
+	 * Constructor of PeriodDataGridChart
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChart类对象的构造函数
+	 * </p>
+	 * <p>
+	 * PeriodDataGridChartのコンストラクター
+	 * </p>
+	 * 
 	 * @param context
-	 * @param attrs 
+	 * @param attrs
 	 */
 	public PeriodDataGridChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/**
 	 * <p>
 	 * initialize degrees on X axis
@@ -103,17 +126,18 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 */
 	protected void initAxisX() {
 		List<String> titleX = new ArrayList<String>();
-		if (null != stickData && stickData.size() > 0) {
-			float average = getDisplayNumber() / this.getLongitudeNum();
-			for (int i = 0; i < this.getLongitudeNum(); i++) {
-				int index = (int) Math.floor(i * average);
-				if (index > getDisplayNumber() - 1) {
-					index = getDisplayNumber() - 1;
-				}
-				titleX.add(formatAxisXDegree(stickData.get(index).getDate()));
-			}
-			titleX.add(formatAxisXDegree(stickData.get(getDisplayNumber() - 1).getDate()));
-		}
+		// if (null != stickData && stickData.size() > 0) {
+		// float average = getDisplayNumber() / this.getLongitudeNum();
+		// for (int i = 0; i < this.getLongitudeNum(); i++) {
+		// int index = (int) Math.floor(i * average);
+		// if (index > getDisplayNumber() - 1) {
+		// index = getDisplayNumber() - 1;
+		// }
+		// titleX.add(formatAxisXDegree(stickData.get(index).getDate()));
+		// }
+		// titleX.add(formatAxisXDegree(stickData.get(getDisplayNumber() -
+		// 1).getDate()));
+		// }
 		super.setLongitudeTitles(titleX);
 	}
 
@@ -129,6 +153,19 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 * </p>
 	 */
 	protected void initAxisY() {
+		// List<String> titleY = rawAxisY();
+		List<String> titleY = initTitleY();
+		super.setLatitudeTitles(titleY);
+	}
+
+	private List<String> initTitleY() {
+		List<String> titleY = new ArrayList<String>();
+		titleY.add("    手");
+		titleY.add(Long.toString((long) maxValue));
+		return titleY;
+	}
+
+	private List<String> rawAxisY() {
 		this.calcValueRange();
 		List<String> titleY = new ArrayList<String>();
 		double average = (maxValue - minValue) / this.getLatitudeNum();
@@ -151,34 +188,30 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 			}
 		}
 		titleY.add(value);
-
-		super.setLatitudeTitles(titleY);
+		return titleY;
 	}
-	
 
-	
-	public float longitudePostOffset(){
+	public float longitudePostOffset() {
 		if (gridAlignType == ALIGN_TYPE_CENTER) {
 			float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
-			return (this.dataQuadrant.getQuadrantPaddingWidth() - stickWidth)/ (longitudeTitles.size() - 1);
-	    }else{
-			return this.dataQuadrant.getQuadrantPaddingWidth()/ (longitudeTitles.size() - 1);
-	    }
+			return (this.dataQuadrant.getQuadrantPaddingWidth() - stickWidth) / (longitudeTitles.size() - 1);
+		} else {
+			return this.dataQuadrant.getQuadrantPaddingWidth() / (longitudeTitles.size() - 1);
+		}
 	}
-	
-	public float longitudeOffset(){
+
+	public float longitudeOffset() {
 		if (gridAlignType == ALIGN_TYPE_CENTER) {
 			float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
 			return dataQuadrant.getQuadrantPaddingStartX() + stickWidth / 2;
-		}else{
+		} else {
 			return dataQuadrant.getQuadrantPaddingStartX();
 		}
 	}
-	
-	
-	protected PointF calcTouchedPoint(float x ,float y) {
-		if (!isValidTouchPoint(x,y)) {
-			return new PointF(0,0);
+
+	protected PointF calcTouchedPoint(float x, float y) {
+		if (!isValidTouchPoint(x, y)) {
+			return new PointF(0, 0);
 		}
 		if (bindCrossLinesToStick == BIND_TO_TYPE_NONE) {
 			return new PointF(x, y);
@@ -193,24 +226,24 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 			return new PointF(x, bindPointF.y);
 		} else {
 			return new PointF(x, y);
-		}	
+		}
 	}
-	
-	protected PointF calcBindPoint(float x ,float y) {
+
+	protected PointF calcBindPoint(float x, float y) {
 		float calcX = 0;
 		float calcY = 0;
-		
-		int index = calcSelectedIndex(x,y);
-		
+
+		int index = calcSelectedIndex(x, y);
+
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
 		IMeasurable stick = stickData.get(index);
-		calcY = (float) ((1f - (stick.getHigh() - minValue)
-				/ (maxValue - minValue))
-				* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+		calcY = (float) ((1f - (stick.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+				.getQuadrantPaddingStartY());
 		calcX = dataQuadrant.getQuadrantPaddingStartX() + stickWidth * (index - getDisplayFrom()) + stickWidth / 2;
-		
-		return new PointF(calcX,calcY);
+
+		return new PointF(calcX, calcY);
 	}
+
 	/**
 	 * <p>
 	 * calculate the distance between two touch points
@@ -235,15 +268,15 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 *         </p>
 	 */
 	protected float calcDistance(MotionEvent event) {
-		if(event.getPointerCount() <= 1) {
+		if (event.getPointerCount() <= 1) {
 			return 0f;
-		}else{
+		} else {
 			float x = event.getX(0) - event.getX(1);
 			float y = event.getY(0) - event.getY(1);
 			return FloatMath.sqrt(x * x + y * y);
 		}
 	}
-	
+
 	/**
 	 * @return the gridAlignType
 	 */
@@ -252,7 +285,8 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	}
 
 	/**
-	 * @param gridAlignType the gridAlignType to set
+	 * @param gridAlignType
+	 *            the gridAlignType to set
 	 */
 	public void setStickAlignType(int stickAlignType) {
 		this.gridAlignType = stickAlignType;

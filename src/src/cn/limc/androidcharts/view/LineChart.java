@@ -108,12 +108,12 @@ public class LineChart extends GridChart implements IZoomable {
 	 * </p>
 	 */
 	private double maxValue;
-	
+
 	private int lineAlignType = DEFAULT_LINE_ALIGN_TYPE;
 
 	public static final boolean DEFAULT_AUTO_CALC_VALUE_RANGE = true;
 	private boolean autoCalcValueRange = DEFAULT_AUTO_CALC_VALUE_RANGE;
-	
+
 	protected OnZoomGestureListener onZoomGestureListener = new OnZoomGestureListener();
 	protected IGestureDetector zoomGestureDetector = new ZoomGestureDetector<IZoomable>(this);
 
@@ -165,8 +165,7 @@ public class LineChart extends GridChart implements IZoomable {
 		double minValue = Double.MAX_VALUE;
 		// 逐条输出MA线
 		for (int i = 0; i < this.linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -275,20 +274,14 @@ public class LineChart extends GridChart implements IZoomable {
 		}
 
 		// 等分轴修正
-		if (this.latitudeNum > 0 && rate > 1
-				&& (long) (this.minValue) % rate != 0) {
+		if (this.latitudeNum > 0 && rate > 1 && (long) (this.minValue) % rate != 0) {
 			// 最大值加上轴差
-			this.minValue = (long) this.minValue
-					- (long) (this.minValue) % rate;
+			this.minValue = (long) this.minValue - (long) (this.minValue) % rate;
 		}
 		// 等分轴修正
-		if (this.latitudeNum > 0
-				&& (long) (this.maxValue - this.minValue)
-						% (this.latitudeNum * rate) != 0) {
+		if (this.latitudeNum > 0 && (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate) != 0) {
 			// 最大值加上轴差
-			this.maxValue = (long) this.maxValue
-					+ this.latitudeNum * rate
-					- (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate);
+			this.maxValue = (long) this.maxValue + this.latitudeNum * rate - (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate);
 		}
 	}
 
@@ -356,8 +349,7 @@ public class LineChart extends GridChart implements IZoomable {
 
 		// draw lines
 		for (int i = 0; i < linesData.size(); i++) {
-			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-					.get(i);
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
 			}
@@ -375,50 +367,46 @@ public class LineChart extends GridChart implements IZoomable {
 			// start point
 			PointF ptFirst = null;
 			if (axisYPosition == AXIS_Y_POSITION_LEFT) {
-	            if (lineAlignType == ALIGN_TYPE_CENTER) {
-	                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / maxPointNum);
-	                startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-	            }else {
-	                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / (maxPointNum - 1));
-	                startX = dataQuadrant.getQuadrantPaddingStartX();
-	            }
-				
+				if (lineAlignType == ALIGN_TYPE_CENTER) {
+					lineLength = (dataQuadrant.getQuadrantPaddingWidth() / maxPointNum);
+					startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+				} else {
+					lineLength = (dataQuadrant.getQuadrantPaddingWidth() / (maxPointNum - 1));
+					startX = dataQuadrant.getQuadrantPaddingStartX();
+				}
+
 				for (int j = 0; j < maxPointNum; j++) {
 					float value = lineData.get(j).getValue();
 					// calculate Y
-					float valueY = (float) ((1f - (value - minValue)
-							/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
+					float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
 							+ dataQuadrant.getQuadrantPaddingStartY();
 
 					// if is not last point connect to previous point
 					if (j > 0) {
-						canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY,
-								mPaint);
+						canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
 					}
 					// reset
 					ptFirst = new PointF(startX, valueY);
 					startX = startX + lineLength;
 				}
 			} else {
-	            if (lineAlignType == ALIGN_TYPE_CENTER) {
-	                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / maxPointNum);
-	                startX = dataQuadrant.getQuadrantPaddingEndX() - lineLength / 2;
-	            }else {
-	                lineLength= (dataQuadrant.getQuadrantPaddingWidth() / (maxPointNum - 1));
-	                startX = dataQuadrant.getQuadrantPaddingEndX();
-	            }
-	            
+				if (lineAlignType == ALIGN_TYPE_CENTER) {
+					lineLength = (dataQuadrant.getQuadrantPaddingWidth() / maxPointNum);
+					startX = dataQuadrant.getQuadrantPaddingEndX() - lineLength / 2;
+				} else {
+					lineLength = (dataQuadrant.getQuadrantPaddingWidth() / (maxPointNum - 1));
+					startX = dataQuadrant.getQuadrantPaddingEndX();
+				}
+
 				for (int j = maxPointNum - 1; j >= 0; j--) {
 					float value = lineData.get(j).getValue();
 					// calculate Y
-					float valueY = (float) ((1f - (value - minValue)
-							/ (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
+					float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
 							+ dataQuadrant.getQuadrantPaddingStartY();
 
 					// if is not last point connect to previous point
 					if (j < maxPointNum - 1) {
-						canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY,
-								mPaint);
+						canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
 					}
 					// reset
 					ptFirst = new PointF(startX, valueY);
@@ -450,8 +438,7 @@ public class LineChart extends GridChart implements IZoomable {
 		if (null == this.linesData) {
 			return "";
 		}
-		LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData
-				.get(0);
+		LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(0);
 		if (line == null) {
 			return "";
 		}
@@ -475,24 +462,23 @@ public class LineChart extends GridChart implements IZoomable {
 	@Override
 	public String getAxisYGraduate(Object value) {
 		float graduate = Float.valueOf(super.getAxisYGraduate(value));
-		return String.valueOf((int) Math.floor(graduate * (maxValue - minValue)
-				+ minValue));
+		return String.valueOf((int) Math.floor(graduate * (maxValue - minValue) + minValue));
 	}
-	
-	public float longitudePostOffset(){
+
+	public float longitudePostOffset() {
 		if (lineAlignType == ALIGN_TYPE_CENTER) {
 			float lineLength = dataQuadrant.getQuadrantPaddingWidth() / maxPointNum;
-			return (this.dataQuadrant.getQuadrantPaddingWidth() - lineLength)/ (longitudeTitles.size() - 1);
-	    }else{
-			return this.dataQuadrant.getQuadrantPaddingWidth()/ (longitudeTitles.size() - 1);
-	    }
+			return (this.dataQuadrant.getQuadrantPaddingWidth() - lineLength) / (longitudeTitles.size() - 1);
+		} else {
+			return this.dataQuadrant.getQuadrantPaddingWidth() / (longitudeTitles.size() - 1);
+		}
 	}
-	
-	public float longitudeOffset(){
+
+	public float longitudeOffset() {
 		if (lineAlignType == ALIGN_TYPE_CENTER) {
 			float lineLength = dataQuadrant.getQuadrantPaddingWidth() / maxPointNum;
 			return dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
-		}else{
+		} else {
 			return dataQuadrant.getQuadrantPaddingStartX();
 		}
 	}
@@ -515,8 +501,7 @@ public class LineChart extends GridChart implements IZoomable {
 		;
 		// calculate degrees on Y axis
 		for (int i = 0; i < this.getLatitudeNum(); i++) {
-			String value = String.valueOf((int) Math.floor(minValue + i
-					* average));
+			String value = String.valueOf((int) Math.floor(minValue + i * average));
 			if (value.length() < super.getLatitudeMaxTitleLength()) {
 				while (value.length() < super.getLatitudeMaxTitleLength()) {
 					value = " " + value;
@@ -556,19 +541,15 @@ public class LineChart extends GridChart implements IZoomable {
 				if (index > maxPointNum - 1) {
 					index = maxPointNum - 1;
 				}
-				titleX.add(String.valueOf(
-						linesData.get(0).getLineData().get(index).getDate())
-						.substring(4));
+				titleX.add(String.valueOf(linesData.get(0).getLineData().get(index).getDate()).substring(4));
 			}
-			titleX.add(String.valueOf(
-					linesData.get(0).getLineData().get(maxPointNum - 1)
-							.getDate()).substring(4));
+			titleX.add(String.valueOf(linesData.get(0).getLineData().get(maxPointNum - 1).getDate()).substring(4));
 		}
 		super.setLongitudeTitles(titleX);
 	}
 
-//	private float olddistance = 0f;
-//	private float newdistance = 0f;
+	// private float olddistance = 0f;
+	// private float newdistance = 0f;
 
 	/*
 	 * (non-Javadoc)
@@ -582,14 +563,14 @@ public class LineChart extends GridChart implements IZoomable {
 	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		//valid
-		if (!isValidTouchPoint(event.getX(),event.getY())) {
+		// valid
+		if (!isValidTouchPoint(event.getX(), event.getY())) {
 			return false;
 		}
 		if (null == linesData || linesData.size() == 0) {
 			return false;
 		}
-		
+
 		return zoomGestureDetector.onTouchEvent(event);
 	}
 
@@ -617,9 +598,9 @@ public class LineChart extends GridChart implements IZoomable {
 	 *         </p>
 	 */
 	protected float calcDistance(MotionEvent event) {
-		if(event.getPointerCount() <= 1) {
+		if (event.getPointerCount() <= 1) {
 			return 0f;
-		}else{
+		} else {
 			float x = event.getX(0) - event.getX(1);
 			float y = event.getY(0) - event.getY(1);
 			return FloatMath.sqrt(x * x + y * y);
@@ -644,13 +625,13 @@ public class LineChart extends GridChart implements IZoomable {
 		if (maxPointNum > 10) {
 			maxPointNum = maxPointNum - ZOOM_STEP;
 		}
-		
+
 		this.postInvalidate();
-		
-//		//Listener
-//		if (onZoomGestureListener != null) {
-//			onZoomGestureListener.onZoom(ZOOM_IN, 0, maxPointNum);
-//		}
+
+		// //Listener
+		// if (onZoomGestureListener != null) {
+		// onZoomGestureListener.onZoom(ZOOM_IN, 0, maxPointNum);
+		// }
 	}
 
 	/**
@@ -671,13 +652,13 @@ public class LineChart extends GridChart implements IZoomable {
 		if (maxPointNum < linesData.get(0).getLineData().size() - 1 - ZOOM_STEP) {
 			maxPointNum = maxPointNum + ZOOM_STEP;
 		}
-		
+
 		this.postInvalidate();
-		
-//		//Listener
-//		if (onZoomGestureListener != null) {
-//			onZoomGestureListener.onZoom(ZOOM_OUT, 0, maxPointNum);
-//		}
+
+		// //Listener
+		// if (onZoomGestureListener != null) {
+		// onZoomGestureListener.onZoom(ZOOM_OUT, 0, maxPointNum);
+		// }
 	}
 
 	/**
@@ -763,25 +744,32 @@ public class LineChart extends GridChart implements IZoomable {
 	}
 
 	/**
-	 * @param lineAlignType the lineAlignType to set
+	 * @param lineAlignType
+	 *            the lineAlignType to set
 	 */
 	public void setLineAlignType(int lineAlignType) {
 		this.lineAlignType = lineAlignType;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param listener 
-	 * @see cn.limc.androidcharts.event.IZoomable#setOnZoomGestureListener(cn.limc.androidcharts.event.OnZoomGestureListener) 
+	 * @param listener
+	 * 
+	 * @see
+	 * cn.limc.androidcharts.event.IZoomable#setOnZoomGestureListener(cn.limc
+	 * .androidcharts.event.OnZoomGestureListener)
 	 */
 	public void setOnZoomGestureListener(OnZoomGestureListener listener) {
 		this.onZoomGestureListener = listener;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @return 
-	 * @see cn.limc.androidcharts.event.IZoomable#getOnZoomGestureListener() 
+	 * @return
+	 * 
+	 * @see cn.limc.androidcharts.event.IZoomable#getOnZoomGestureListener()
 	 */
 	public OnZoomGestureListener getOnZoomGestureListener() {
 		return onZoomGestureListener;

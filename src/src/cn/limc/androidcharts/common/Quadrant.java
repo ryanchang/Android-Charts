@@ -19,29 +19,34 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.common;
 
 import cn.limc.androidcharts.view.GridChart;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/06/24 17:29:01 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/06/24 17:29:01
+ * 
  */
-public abstract class Quadrant implements IQuadrant{
-	
+public abstract class Quadrant implements IQuadrant {
+
 	protected GridChart inChart;
-	
+
 	public Quadrant(GridChart inChart) {
 		this.inChart = inChart;
-		
+
 	}
-	
+
 	/**
 	 * <p>
 	 * Margin of the axis to the top border
@@ -50,7 +55,7 @@ public abstract class Quadrant implements IQuadrant{
 	 * 轴線より上枠線の距離
 	 * </p>
 	 * <p>
-	 * 轴线上边距
+	 * 轴线上边距,也就是纬线距离GridChart上边框的距离
 	 * </p>
 	 */
 	protected float paddingTop = DEFAULT_PADDING_TOP;
@@ -144,8 +149,7 @@ public abstract class Quadrant implements IQuadrant{
 
 	/**
 	 * @param padding
-	 *            the paddingTop paddingBottom
-	 *            paddingLeft paddingRight to set
+	 *            the paddingTop paddingBottom paddingLeft paddingRight to set
 	 * 
 	 */
 	public void setQuadrantPadding(float padding) {
@@ -180,22 +184,21 @@ public abstract class Quadrant implements IQuadrant{
 	 *            the paddingRight to set
 	 * 
 	 */
-	public void setQuadrantPadding(float top, float right, float bottom,
-			float left) {
+	public void setQuadrantPadding(float top, float right, float bottom, float left) {
 		this.paddingTop = top;
 		this.paddingLeft = right;
 		this.paddingBottom = bottom;
 		this.paddingRight = left;
 	}
-	
-	public float getQuadrantEndX(){
+
+	public float getQuadrantEndX() {
 		return getQuadrantStartX() + getQuadrantWidth();
 	}
 
-	public float getQuadrantEndY(){
+	public float getQuadrantEndY() {
 		return getQuadrantStartY() + getQuadrantHeight();
 	}
-	
+
 	public float getQuadrantPaddingStartX() {
 		return getQuadrantStartX() + paddingLeft;
 	}
@@ -213,13 +216,11 @@ public abstract class Quadrant implements IQuadrant{
 	}
 
 	public float getQuadrantPaddingWidth() {
-		return getQuadrantWidth() - paddingLeft
-				- paddingRight;
+		return getQuadrantWidth() - paddingLeft - paddingRight;
 	}
 
 	public float getQuadrantPaddingHeight() {
-		return getQuadrantHeight() - paddingTop
-				- paddingBottom;
+		return getQuadrantHeight() - paddingTop - paddingBottom;
 	}
 
 }

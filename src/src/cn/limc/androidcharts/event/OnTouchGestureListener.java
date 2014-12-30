@@ -19,38 +19,50 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.event;
 
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/06/23 15:52:21 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/06/23 15:52:21
+ * 
  */
 public class OnTouchGestureListener {
 
-	public void onTouchDown(ITouchable touchable,MotionEvent event){
-		if (touchable != null) { 
-			touchable.touchDown(new PointF(event.getX(),event.getY()));
+	/**
+	 * 手势监听器的回调方法. 当手势探测器探测到触屏事件后,通过改回调方法告手势监听器,产生了触屏事件.
+	 * 然后触屏事件在通过ITouchable接口的回调方法,将触屏事件按告诉被点击的图标,画出十字线.
+	 * 
+	 * @param touchable
+	 * @param event
+	 */
+	public void onTouchDown(ITouchable touchable, MotionEvent event) {
+		if (touchable != null) {
+			touchable.touchDown(new PointF(event.getX(), event.getY()));
 		}
 	}
-	
-	public void onTouchMoved(ITouchable touchable,MotionEvent event){
+
+	public void onTouchMoved(ITouchable touchable, MotionEvent event) {
 		if (touchable != null) {
-			touchable.touchMoved(new PointF(event.getX(),event.getY()));
+			touchable.touchMoved(new PointF(event.getX(), event.getY()));
 		}
 	}
-	
-	public void onTouchUp(ITouchable touchable,MotionEvent event){
+
+	public void onTouchUp(ITouchable touchable, MotionEvent event) {
 		if (touchable != null) {
-			touchable.touchUp(new PointF(event.getX(),event.getY()));
+			touchable.touchUp(new PointF(event.getX(), event.getY()));
 		}
 	}
 }

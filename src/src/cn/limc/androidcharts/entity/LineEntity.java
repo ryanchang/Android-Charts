@@ -91,6 +91,7 @@ public class LineEntity<T> {
 	 * </p>
 	 */
 	private boolean display = true;
+	private int shadowAreaColor = lineColor;
 
 	/**
 	 * <p>
@@ -226,4 +227,13 @@ public class LineEntity<T> {
 	public void setDisplay(boolean display) {
 		this.display = display;
 	}
+
+	public void setShadowAreaColor(int color) {
+		this.shadowAreaColor = color;
+	}
+
+	public int getShadowAreaColor() {
+		return this.shadowAreaColor;
+	}
+
 }
