@@ -165,6 +165,7 @@ public class SlipStickChart extends StickChart implements ISlipable {
 
 	protected PointF startPointA;
 	protected PointF startPointB;
+	private boolean slipStickChartUnclickable;
 
 	/*
 	 * (non-Javadoc)
@@ -186,7 +187,11 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (null == stickData || stickData.size() == 0) {
 			return false;
 		}
-		return slipGestureDetector.onTouchEvent(event);
+		if (!slipStickChartUnclickable) {
+			return false;
+		} else {
+			return slipGestureDetector.onTouchEvent(event);
+		}
 	}
 
 	/*
@@ -213,6 +218,14 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (onDisplayCursorListener != null) {
 			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 		}
+	}
+
+	public boolean isSlipStickChartUnclickable() {
+		return slipStickChartUnclickable;
+	}
+
+	public void setSlipStickChartUnclickable(boolean slipStickChartUnclickable) {
+		this.slipStickChartUnclickable = slipStickChartUnclickable;
 	}
 
 	/*
