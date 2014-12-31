@@ -33,6 +33,7 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.PointF;
 import android.graphics.Rect;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -662,7 +663,8 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 	private String time;
 	private boolean centerLatitudeNeddDashEffect;
-
+	// 矩形边框的右侧显示的标题.
+	private List<String> otherSideLatitudeTitle;
 
 	/*
 	 * (non-Javadoc)
@@ -776,7 +778,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	protected boolean isValidTouchPoint(float x, float y) {
 
 		// 判断被点击的点是否是有效点
-
 		if (x < dataQuadrant.getQuadrantPaddingStartX() || x > dataQuadrant.getQuadrantPaddingEndX()) {
 			return false;
 		}
@@ -995,16 +996,17 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 		Paint mPaint = new Paint();
 		mPaint.setColor(crossLinesColor);
-
 		// float lineVLength = dataQuadrant.getQuadrantHeight() + axisWidth;
-		float lineVLength = getHeight() * 7 / 5;
+		// 此处可以修改,将两个分时图连接起来
+		float lineVLength = dataQuadrant.getQuadrantHeight();
 
 		PointF boxVS = new PointF(touchPoint.x - longitudeFontSize * 5f / 2f, borderWidth + lineVLength);
 		PointF boxVE = new PointF(touchPoint.x + longitudeFontSize * 5f / 2f, borderWidth + lineVLength + axisXTitleQuadrantHeight);
-
 		// draw text
-
 		time = getAxisXGraduate(touchPoint.x);
+		if (TextUtils.equals("", time)) {
+			return;
+		}
 		drawAlphaTextBox(boxVS, boxVE, time, longitudeFontSize, canvas);
 
 		canvas.drawLine(touchPoint.x, borderWidth, touchPoint.x, lineVLength, mPaint);
@@ -1138,7 +1140,8 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	// 获取象限的宽度,减去内边距
 
 	public float longitudePostOffset() {
-		return this.dataQuadrant.getQuadrantPaddingWidth() / (longitudeTitles.size() - 1);
+		// 设置显示的经线的刻度.
+		return this.dataQuadrant.getQuadrantPaddingWidth() / (longitudeNum);
 	}
 
 	public float longitudeOffset() {
@@ -1159,13 +1162,10 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	 * @param canvas
 	 */
 	protected void drawLongitudeLine(Canvas canvas) {
-		if (null == longitudeTitles) {
-			return;
-		}
 		if (!displayLongitude) {
 			return;
 		}
-		int counts = longitudeTitles.size();
+		int counts = longitudeNum;
 		// 获取象限的高度
 		float length = dataQuadrant.getQuadrantHeight() + latitudeWidth * 2 + borderWidth;
 
@@ -1181,8 +1181,8 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 			float postOffset = longitudePostOffset();
 			float offset = longitudeOffset();
 
-			for (int i = 0; i < counts; i++) {
-				if (i == 0 || i == counts - 1) {
+			for (int i = 0; i <= counts; i++) {
+				if (i == 0 || i == counts) {
 					continue;
 				}
 				Path path = new Path();
@@ -1239,7 +1239,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 			} else {
 				canvas.drawText(longitudeTitles.get(i), offset + i * postOffset - getTextBounds(longitudeTitles.get(i), mPaintFont) / 2f, super.getHeight()
 
-						- axisXTitleQuadrantHeight + longitudeFontSize, mPaintFont);
+				- axisXTitleQuadrantHeight + longitudeFontSize, mPaintFont);
 			}
 
 		}
@@ -1385,7 +1385,22 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 				}
 			}
 		}
-
+		float startFrom = borderWidth;
+		if (otherSideLatitudeTitle == null) {
+			return;
+		}
+		if (!hasTitlesBothSides) {
+			return;
+		}
+		for (int i = 0; i < this.otherSideLatitudeTitle.size(); i++) {
+			if (i == 0) {
+				canvas.drawText(this.otherSideLatitudeTitle.get(i), super.getWidth() - axisYTitleQuadrantWidth + 2f, super.getHeight()
+						- this.axisXTitleQuadrantHeight - borderWidth - axisWidth - 2f, mPaintFont);
+			} else {
+				canvas.drawText(this.otherSideLatitudeTitle.get(i), super.getWidth() - axisYTitleQuadrantWidth + 2f, offset - i * postOffset + latitudeFontSize
+						/ 2f, mPaintFont);
+			}
+		}
 	}
 
 	/**
@@ -1748,6 +1763,15 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		this.latitudeTitles = latitudeTitles;
 	}
 
+	public void setOtherSideLatitudeTitles(List<String> titles) {
+		this.otherSideLatitudeTitle = titles;
+		Log.i("info", "this.otherSideLatitudeTitle=" + this.otherSideLatitudeTitle.size() + ",titles=" + otherSideLatitudeTitle.toString());
+	}
+
+	public List<String> getOtherSideLatitudeTitles() {
+		return otherSideLatitudeTitle;
+	}
+
 	/**
 	 * @return the latitudeMaxTitleLength
 	 */
@@ -1892,11 +1916,8 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	}
 
 	/*
-<<<<<<< HEAD
-	 * (non-Javadoc) 设置手势动作的监听器
-=======
-	 * (non-Javadoc)
->>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * <<<<<<< HEAD (non-Javadoc) 设置手势动作的监听器 ======= (non-Javadoc) >>>>>>>
+	 * 86880b7103ed7b3ca3683f4be088adf45da3b59f
 	 * 
 	 * @param listener
 	 * 
@@ -1909,16 +1930,16 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	}
 
 	/*
-	 * (non-Javadoc)
-<<<<<<< HEAD
+	 * (non-Javadoc) <<<<<<< HEAD
 	 * 
 	 * @return
 	 * 
-=======
+	 * =======
 	 * 
 	 * @return
 	 * 
->>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * >>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * 
 	 * @see cn.limc.androidcharts.event.ITouchable#getOnTouchGestureListener()
 	 */
 	public OnTouchGestureListener getOnTouchGestureListener() {
@@ -1933,11 +1954,10 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	}
 
 	/**
-<<<<<<< HEAD
-	 * 设置手势监听器的探测器
+	 * <<<<<<< HEAD 设置手势监听器的探测器
 	 * 
-=======
->>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * ======= >>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * 
 	 * @param touchGestureDetector
 	 *            the touchGestureDetector to set
 	 */

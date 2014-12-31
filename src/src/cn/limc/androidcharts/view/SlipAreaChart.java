@@ -56,7 +56,6 @@ public class SlipAreaChart extends SlipLineChart {
 	private double maxChangPrice;
 	private int shadowAreaColor;
 
-
 	/**
 	 * <p>
 	 * Constructor of SlipAreaChart
@@ -249,6 +248,5 @@ public class SlipAreaChart extends SlipLineChart {
 		this.maxChangPrice = maxChangPrice;
 
 	}
-
 
 }

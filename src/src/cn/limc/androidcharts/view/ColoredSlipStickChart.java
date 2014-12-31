@@ -183,7 +183,6 @@ public class ColoredSlipStickChart extends SlipStickChart {
 		float graduate = Float.valueOf(super.getAxisXGraduate(value));
 		int index = (int) Math.floor(graduate * displayNumber);
 		ColoredStickEntity entity = (ColoredStickEntity) stickData.get(index);
-		Log.i("info", "SCCchart.tradeVolume=" + entity.getHigh());
 		return entity.getHigh();
 	}
 

@@ -312,7 +312,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected void onDraw(Canvas canvas) {
 		initAxisY();
 		initAxisX();
-
 		super.onDraw(canvas);
 
 		// draw lines
@@ -454,10 +453,43 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected void initAxisY() {
 		// 注释掉从数据中计算最大值和最小值
 		// this.calcValueRange();
-
-		// rawMethodTitleY(titleY);
+		List<String> rightTitles = initRightYAxisTitles();
+		setOtherSideLatitudeTitles(rightTitles);
 		List<String> titleY = initYAxisTitle();
 		super.setLatitudeTitles(titleY);
+	}
+
+	private List<String> initRightYAxisTitles() {
+		List<String> titles = new ArrayList<String>();
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i <= this.getLatitudeNum(); i++) {
+			if (i == 0) {
+				double changePer = maxChangPrice / closingPrice;
+				builder.append("-").append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else if (i == 2) {
+				builder.append("0.00").append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else if (i == 4) {
+				double changePer = maxChangPrice / closingPrice;
+				builder.append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else if (i == 1) {
+				double changePer = maxChangPrice / (closingPrice * 2);
+				builder.append("-").append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else {
+				double changePer = maxChangPrice / (closingPrice * 2);
+				builder.append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			}
+		}
+		return titles;
 	}
 
 	private List<String> initYAxisTitle() {
@@ -684,12 +716,28 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
 			setDisplayCrossXOnTouch(false);
 			setDisplayCrossYOnTouch(false);
-		} else {
+		} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			setDisplayCrossXOnTouch(true);
 			setDisplayCrossYOnTouch(true);
 		}
 		return slipGestureDetector.onTouchEvent(event);
 	}
+
+	// @Override
+	// protected boolean isValidTouchPoint(float x, float y) {
+	// if (x < dataQuadrant.getQuadrantPaddingStartX() || x >
+	// dataQuadrant.getQuadrantPaddingEndX()) {
+	// return false;
+	// }
+	// if (y < dataQuadrant.getQuadrantPaddingStartY() || y >
+	// dataQuadrant.getQuadrantPaddingEndY()) {
+	// return false;
+	// }
+	// if (currentIndex >= linesData.size()) {
+	// return false;
+	// }
+	// return true;
+	// }
 
 	/**
 	 * <p>
