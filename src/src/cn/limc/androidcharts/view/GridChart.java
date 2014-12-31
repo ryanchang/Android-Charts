@@ -1069,7 +1069,9 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		}
 		dotInfo.setAvgPrice(getAvgPrice(0));
 		dotInfo.setTradeVolume(getTradeNumHigh(touchPoint.x));
-		crossDisplayListener.crossDisplay(true, dotInfo);
+		if (crossDisplayListener != null) {
+			crossDisplayListener.crossDisplay(true, dotInfo);
+		}
 	}
 
 	public float getCrossYPostion(float value) {
@@ -1911,7 +1913,9 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	public void touchUp(PointF pt) {
 		this.touchPoint = pt;
 		this.fromTouch = true;
-		crossDisplayListener.crossDisplay(false, null);
+		if (crossDisplayListener != null) {
+			crossDisplayListener.crossDisplay(false, null);
+		}
 		this.postInvalidate();
 	}
 

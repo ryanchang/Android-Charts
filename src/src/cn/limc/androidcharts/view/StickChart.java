@@ -76,7 +76,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 		}
 	};
 
-	public static final int DEFAULT_STICK_SPACING = 1;
+	public static final float DEFAULT_STICK_SPACING = 1;
 
 	/**
 	 * <p>
@@ -93,7 +93,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 
 	protected int minDisplayNum = MINI_DISPLAY_NUM;
 
-	protected int stickSpacing = DEFAULT_STICK_SPACING;
+	protected float stickSpacing = DEFAULT_STICK_SPACING;
 
 	protected OnZoomGestureListener onZoomGestureListener = new OnZoomGestureListener();
 	protected IGestureDetector zoomGestureDetector = new ZoomGestureDetector<IZoomable>(this);
@@ -320,7 +320,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 	/**
 	 * @return the stickSpacing
 	 */
-	public int getStickSpacing() {
+	public float getStickSpacing() {
 		return stickSpacing;
 	}
 
@@ -328,7 +328,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 	 * @param stickSpacing
 	 *            the stickSpacing to set
 	 */
-	public void setStickSpacing(int stickSpacing) {
+	public void setStickSpacing(float stickSpacing) {
 		this.stickSpacing = stickSpacing;
 	}
 

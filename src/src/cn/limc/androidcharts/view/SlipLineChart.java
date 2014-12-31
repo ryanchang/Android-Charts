@@ -26,22 +26,25 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.util.LangUtils;
-
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import cn.limc.androidcharts.entity.DateValueEntity;
 import cn.limc.androidcharts.entity.LineEntity;
 import cn.limc.androidcharts.event.IGestureDetector;
 import cn.limc.androidcharts.event.ISlipable;
 import cn.limc.androidcharts.event.IZoomable;
-import cn.limc.androidcharts.event.OnCrossDisplayListener;
 import cn.limc.androidcharts.event.OnSlipGestureListener;
 import cn.limc.androidcharts.event.OnZoomGestureListener;
 import cn.limc.androidcharts.event.SlipGestureDetector;
@@ -120,6 +123,17 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected OnSlipGestureListener onSlipGestureListener = new OnSlipGestureListener();
 
 	protected IGestureDetector slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
+	protected OnLongClickListener longClickListener = new OnLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v) {
+			Log.i("info", "66666666666666666666666666");
+			setDisplayCrossXOnTouch(true);
+			setDisplayCrossYOnTouch(true);
+			slipGestureDetector.onTouchEvent(event);
+			return true;
+		}
+	};
 
 	private int currentIndex;
 
@@ -179,11 +193,9 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 					if (lineData.getValue() < minValue) {
 						minValue = lineData.getValue();
 					}
-
 					if (lineData.getValue() > maxValue) {
 						maxValue = lineData.getValue();
 					}
-
 				}
 			}
 		}
@@ -313,7 +325,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		initAxisY();
 		initAxisX();
 		super.onDraw(canvas);
-
 		// draw lines
 		if (null != this.linesData) {
 			drawLines(canvas);
@@ -453,8 +464,10 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected void initAxisY() {
 		// 注释掉从数据中计算最大值和最小值
 		// this.calcValueRange();
-		List<String> rightTitles = initRightYAxisTitles();
-		setOtherSideLatitudeTitles(rightTitles);
+		if (isHasTitlesBothSides()) {
+			List<String> rightTitles = initRightYAxisTitles();
+			setOtherSideLatitudeTitles(rightTitles);
+		}
 		List<String> titleY = initYAxisTitle();
 		super.setLatitudeTitles(titleY);
 	}
@@ -702,8 +715,39 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	private int shadowAreaColor;
 
+	private boolean canHandleTouchEvent;
+
+	private boolean mHasPerformedLongPress;
+
+	private CheckForLongPress mPendingCheckForLongPress;
+	private int mWindowAttachCount;
+
+	private PerformClick mPerformClick;
+	private MotionEvent event;
+
+	private boolean displayCrossLongPressed;
+
+	public boolean isDisplayCrossLongPressed() {
+		return displayCrossLongPressed;
+	}
+
+	public void setDisplayCrossLongPressed(boolean displayCrossLongPressed) {
+		this.displayCrossLongPressed = displayCrossLongPressed;
+	}
+
+	public boolean isCanHandleTouchEvent() {
+		return canHandleTouchEvent;
+	}
+
+	public void setCanHandleTouchEvent(boolean canHandleTouchEvent) {
+		this.canHandleTouchEvent = canHandleTouchEvent;
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		if (displayCrossLongPressed) {
+			setOnLongClickListener(longClickListener);
+		}
 		if (!isValidTouchPoint(event.getX(), event.getY())) {
 			return false;
 		}
@@ -711,16 +755,80 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			return false;
 		}
 		if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+			setPressed(false);
 			setDisplayCrossXOnTouch(false);
 			setDisplayCrossYOnTouch(false);
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
+			// setPressed(false);
 			setDisplayCrossXOnTouch(false);
 			setDisplayCrossYOnTouch(false);
+			boolean focusTaken = false;
+			if (isFocusable() && isFocusableInTouchMode() && !isFocused()) {
+				focusTaken = requestFocus();
+			}
+			if (!mHasPerformedLongPress) {
+				removeCallbacks(mPendingCheckForLongPress);
+				Log.i("info", "33333333333333333333");
+				if (!focusTaken) {
+					if (mPerformClick == null) {
+						mPerformClick = new PerformClick();
+					}
+					performClick();
+				}
+			}
 		} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			setDisplayCrossXOnTouch(true);
-			setDisplayCrossYOnTouch(true);
+			mHasPerformedLongPress = false;
+			setPressed(true);
+			this.event = event;
+			checkForLongClick(0);
 		}
 		return slipGestureDetector.onTouchEvent(event);
+	}
+
+	class PerformClick implements Runnable {
+
+		@Override
+		public void run() {
+			performClick();
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	public boolean isInScrollingContainer() {
+		ViewParent p = getParent();
+		while (p != null && p instanceof ViewGroup) {
+			if (((ViewGroup) p).shouldDelayChildPressedState()) {
+				return true;
+			}
+			p = p.getParent();
+		}
+		return false;
+	}
+
+	private void checkForLongClick(int delayOffset) {
+		mHasPerformedLongPress = false;
+		if (mPendingCheckForLongPress == null) {
+			mPendingCheckForLongPress = new CheckForLongPress();
+		}
+		// mPendingCheckForLongPress.rememberWindowAttachCount();
+		postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout() - delayOffset);
+	}
+
+	class CheckForLongPress implements Runnable {
+
+		private int mOriginalWindowAttachCount;
+
+		public void run() {
+			if (isPressed() && displayCrossLongPressed) {
+				if (performLongClick()) {
+					mHasPerformedLongPress = true;
+				}
+			}
+		}
+
+		public void rememberWindowAttachCount() {
+			mOriginalWindowAttachCount = mWindowAttachCount;
+		}
 	}
 
 	// @Override

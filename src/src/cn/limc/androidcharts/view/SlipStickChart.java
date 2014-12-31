@@ -187,11 +187,10 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (null == stickData || stickData.size() == 0) {
 			return false;
 		}
-		if (!slipStickChartUnclickable) {
+		if (slipStickChartUnclickable) {
 			return false;
-		} else {
-			return slipGestureDetector.onTouchEvent(event);
 		}
+		return slipGestureDetector.onTouchEvent(event);
 	}
 
 	/*
