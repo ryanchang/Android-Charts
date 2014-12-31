@@ -43,6 +43,80 @@ public abstract class StickMole extends RectMole {
 
 	public static final int DEFAULT_STICK_SPACING = 1;
 	public static final int DEFAULT_STICK_STROKE_WIDTH = 0;
+	/**
+	 * <p>
+	 * Default price up stick's fill color
+	 * </p>
+	 * <p>
+	 * 値上がりローソクの色のデフォルト値
+	 * </p>
+	 * <p>
+	 * 默认阳线的填充颜色
+	 * </p>
+	 */
+	public static final int DEFAULT_POSITIVE_STICK_FILL_COLOR = Color.RED;
+	/**
+	 * <p>
+	 * Default price down stick's fill color
+	 * </p>
+	 * <p>
+	 * 値下りローソクの色のデフォルト値
+	 * </p>
+	 * <p>
+	 * 默认阴线的填充颜色
+	 * </p>
+	 */
+	public static final int DEFAULT_NEGATIVE_STICK_FILL_COLOR = Color.GREEN;
+
+	/**
+	 * <p>
+	 * Default price no change stick's color (cross-star,T-like etc.)
+	 * </p>
+	 * <p>
+	 * クローススターの色のデフォルト値
+	 * </p>
+	 * <p>
+	 * 默认十字线显示颜色
+	 * </p>
+	 */
+	public static final int DEFAULT_CROSS_STAR_COLOR = Color.LTGRAY;
+	/**
+	 * <p>
+	 * Price up stick's fill color
+	 * </p>
+	 * <p>
+	 * 値上がりローソクの色
+	 * </p>
+	 * <p>
+	 * 阳线的填充颜色
+	 * </p>
+	 */
+	private int positiveStickFillColor = DEFAULT_POSITIVE_STICK_FILL_COLOR;
+	/**
+	 * <p>
+	 * Price down stick's fill color
+	 * </p>
+	 * <p>
+	 * 値下りローソクの色
+	 * </p>
+	 * <p>
+	 * 阴线的填充颜色
+	 * </p>
+	 */
+	private int negativeStickFillColor = DEFAULT_NEGATIVE_STICK_FILL_COLOR;
+	
+	/**
+	 * <p>
+	 * Price no change stick's color (cross-star,T-like etc.)
+	 * </p>
+	 * <p>
+	 * クローススターの色（価格変動無し）
+	 * </p>
+	 * <p>
+	 * 十字线显示颜色（十字星,一字平线,T形线的情况）
+	 * </p>
+	 */
+	private int crossStarColor = DEFAULT_CROSS_STAR_COLOR;
 	
 	/**
 	 * <p>
@@ -122,6 +196,16 @@ public abstract class StickMole extends RectMole {
 	 * @see cn.limc.androidcharts.mole.IMole#draw(android.graphics.Canvas) 
 	 */
 	public void draw(Canvas canvas) {	
+		
+		Paint mPaintPositive = new Paint();
+		mPaintPositive.setColor(positiveStickFillColor);
+
+		Paint mPaintNegative = new Paint();
+		mPaintNegative.setColor(negativeStickFillColor);
+
+		Paint mPaintCross = new Paint();
+		mPaintCross.setColor(crossStarColor);
+		
 		Paint mPaintFill = new Paint();
 		mPaintFill.setStyle(Style.FILL);
 		mPaintFill.setColor(stickFillColor);

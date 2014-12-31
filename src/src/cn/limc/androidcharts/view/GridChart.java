@@ -1913,15 +1913,14 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	public void touchUp(PointF pt) {
 		this.touchPoint = pt;
 		this.fromTouch = true;
-		if (crossDisplayListener != null) {
+		if(crossDisplayListener != null){
 			crossDisplayListener.crossDisplay(false, null);
-		}
+		}		
 		this.postInvalidate();
 	}
 
 	/*
-	 * <<<<<<< HEAD (non-Javadoc) 设置手势动作的监听器 ======= (non-Javadoc) >>>>>>>
-	 * 86880b7103ed7b3ca3683f4be088adf45da3b59f
+	 * (non-Javadoc) 设置手势动作的监听器
 	 * 
 	 * @param listener
 	 * 
@@ -1934,15 +1933,9 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	}
 
 	/*
-	 * (non-Javadoc) <<<<<<< HEAD
+	 * (non-Javadoc)
 	 * 
 	 * @return
-	 * 
-	 * =======
-	 * 
-	 * @return
-	 * 
-	 * >>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
 	 * 
 	 * @see cn.limc.androidcharts.event.ITouchable#getOnTouchGestureListener()
 	 */
@@ -1958,10 +1951,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	}
 
 	/**
-	 * <<<<<<< HEAD 设置手势监听器的探测器
-	 * 
-	 * ======= >>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
-	 * 
+	 * 设置手势监听器的探测器
 	 * @param touchGestureDetector
 	 *            the touchGestureDetector to set
 	 */
