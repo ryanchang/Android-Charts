@@ -1887,16 +1887,14 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	public void touchUp(PointF pt) {
 		this.touchPoint = pt;
 		this.fromTouch = true;
-		crossDisplayListener.crossDisplay(false, null);
+		if(crossDisplayListener != null){
+			crossDisplayListener.crossDisplay(false, null);
+		}		
 		this.postInvalidate();
 	}
 
 	/*
-<<<<<<< HEAD
 	 * (non-Javadoc) 设置手势动作的监听器
-=======
-	 * (non-Javadoc)
->>>>>>> 86880b7103ed7b3ca3683f4be088adf45da3b59f
 	 * 
 	 * @param listener
 	 * 
