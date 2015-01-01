@@ -93,6 +93,16 @@ public class LineEntity<T> {
 	private boolean display = true;
 	private int shadowAreaColor = lineColor;
 
+	private float lineWidth = 2f;
+
+	public float getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(float lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
 	/**
 	 * <p>
 	 * Constructor of LineEntity

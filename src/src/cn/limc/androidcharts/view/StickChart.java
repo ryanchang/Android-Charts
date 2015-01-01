@@ -151,11 +151,12 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 	 * 
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
+	// 初始话XY轴,并画出基本的柱状图
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (this.autoCalcValueRange) {
-			calcValueRange();
-		}
+		// if (this.autoCalcValueRange) {
+		// calcValueRange();
+		// }
 		initAxisY();
 		initAxisX();
 		super.onDraw(canvas);
@@ -186,9 +187,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
 
 		if (axisYPosition == AXIS_Y_POSITION_LEFT) {
-
 			float stickX = dataQuadrant.getQuadrantPaddingStartX();
-			// 待修改,所需要画的交易量的总数也应该是242
 			for (int i = 0; i < stickData.size(); i++) {
 				IMeasurable stick = stickData.get(i);
 				if (stick == null) {
@@ -196,6 +195,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 				}
 				StickMole mole = (StickMole) provider.getMole();
 				mole.setUp(this, stick, stickX, stickWidth);
+				Log.i("info", "drawStick.isCalled");
 				mole.draw(canvas);
 				// next x
 				stickX = stickX + stickWidth;

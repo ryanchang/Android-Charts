@@ -177,7 +177,6 @@ public class ColoredSlipStickChart extends SlipStickChart {
 		this.dataSize = displayDataSize;
 	}
 
-
 	@Override
 	public double getTradeNumHigh(float value) {
 		float graduate = Float.valueOf(super.getAxisXGraduate(value));

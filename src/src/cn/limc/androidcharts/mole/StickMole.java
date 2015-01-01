@@ -19,7 +19,6 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.mole;
 
 import cn.limc.androidcharts.common.IChart;
@@ -30,14 +29,20 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/06/19 16:39:05 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/06/19 16:39:05
+ * 
  */
 public abstract class StickMole extends RectMole {
 
@@ -104,7 +109,7 @@ public abstract class StickMole extends RectMole {
 	 * </p>
 	 */
 	private int negativeStickFillColor = DEFAULT_NEGATIVE_STICK_FILL_COLOR;
-	
+
 	/**
 	 * <p>
 	 * Price no change stick's color (cross-star,T-like etc.)
@@ -117,7 +122,7 @@ public abstract class StickMole extends RectMole {
 	 * </p>
 	 */
 	private int crossStarColor = DEFAULT_CROSS_STAR_COLOR;
-	
+
 	/**
 	 * <p>
 	 * default color for display stick border
@@ -169,34 +174,42 @@ public abstract class StickMole extends RectMole {
 	 * </p>
 	 */
 	protected int stickFillColor = DEFAULT_STICK_FILL_COLOR;
-	
+
 	protected int stickStrokeWidth = DEFAULT_STICK_STROKE_WIDTH;
 	protected int stickSpacing = DEFAULT_STICK_SPACING;
-	
+
 	private IMeasurable stickData;
-	
-	/** 
-	 * <p>Constructor of StickMole</p>
-	 * <p>StickMole类对象的构造函数</p>
-	 * <p>StickMoleのコンストラクター</p>
-	 *
-	 * @param inRect 
+
+	/**
+	 * <p>
+	 * Constructor of StickMole
+	 * </p>
+	 * <p>
+	 * StickMole类对象的构造函数
+	 * </p>
+	 * <p>
+	 * StickMoleのコンストラクター
+	 * </p>
+	 * 
+	 * @param inRect
 	 */
-	public void setUp(IChart chart ,IMeasurable data, float from , float width) {
+	public void setUp(IChart chart, IMeasurable data, float from, float width) {
 		super.setUp(chart);
 		this.setPro();
 		setStickData(data);
 		left = from;
 		right = from + width - stickSpacing;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param canvase 
-	 * @see cn.limc.androidcharts.mole.IMole#draw(android.graphics.Canvas) 
+	 * @param canvase
+	 * 
+	 * @see cn.limc.androidcharts.mole.IMole#draw(android.graphics.Canvas)
 	 */
-	public void draw(Canvas canvas) {	
-		
+	public void draw(Canvas canvas) {
+
 		Paint mPaintPositive = new Paint();
 		mPaintPositive.setColor(positiveStickFillColor);
 
@@ -205,25 +218,25 @@ public abstract class StickMole extends RectMole {
 
 		Paint mPaintCross = new Paint();
 		mPaintCross.setColor(crossStarColor);
-		
+
 		Paint mPaintFill = new Paint();
 		mPaintFill.setStyle(Style.FILL);
 		mPaintFill.setColor(stickFillColor);
-		
+
 		if (width() >= 2f && width() >= 2 * stickStrokeWidth) {
-			if (stickStrokeWidth  > 0) {
+			if (stickStrokeWidth > 0) {
 				Paint mPaintBorder = new Paint();
 				mPaintBorder.setStyle(Style.STROKE);
 				mPaintBorder.setStrokeWidth(stickStrokeWidth);
 				mPaintBorder.setColor(stickBorderColor);
-				
+
 				canvas.drawRect(left + stickStrokeWidth, top + stickStrokeWidth, right - stickStrokeWidth, bottom - stickStrokeWidth, mPaintFill);
 				canvas.drawRect(left + stickStrokeWidth, top + stickStrokeWidth, right - stickStrokeWidth, bottom - stickStrokeWidth, mPaintBorder);
-			}else{
+			} else {
 				canvas.drawRect(left, top, right, bottom, mPaintFill);
 			}
 		} else {
-			canvas.drawLine(left, top, left, bottom, mPaintFill);	
+			canvas.drawLine(left, top, left, bottom, mPaintFill);
 		}
 	}
 
@@ -235,19 +248,20 @@ public abstract class StickMole extends RectMole {
 	}
 
 	/**
-	 * @param stickData the stickData to set
+	 * @param stickData
+	 *            the stickData to set
 	 */
 	public void setStickData(IMeasurable stickData) {
 		this.stickData = stickData;
-		DataGridChart chart = (DataGridChart)getInChart();
+		DataGridChart chart = (DataGridChart) getInChart();
 		float highY = (float) ((1f - (stickData.getHigh() - chart.getMinValue()) / (chart.getMaxValue() - chart.getMinValue()))
 				* (chart.getDataQuadrant().getQuadrantPaddingHeight()) + chart.getDataQuadrant().getQuadrantPaddingStartY());
 		float lowY = (float) ((1f - (stickData.getLow() - chart.getMinValue()) / (chart.getMaxValue() - chart.getMinValue()))
 				* (chart.getDataQuadrant().getQuadrantPaddingHeight()) + chart.getDataQuadrant().getQuadrantPaddingStartY());
-		
+
 		top = highY;
 		bottom = lowY;
 	}
-	
+
 	public abstract void setPro();
 }

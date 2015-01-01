@@ -170,8 +170,7 @@ public class OHLCEntity implements IStickEntity {
 	 *            日期
 	 *            </p>
 	 */
-	public OHLCEntity(double open, double high, double low, double close,
-			int date) {
+	public OHLCEntity(double open, double high, double low, double close, int date) {
 		super();
 		this.open = open;
 		this.high = high;
@@ -270,4 +269,11 @@ public class OHLCEntity implements IStickEntity {
 	public void setDate(int date) {
 		this.date = date;
 	}
+
+	@Override
+	public String toString() {
+		return "OHLCEntity [open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", date=" + date + "]";
+	}
+
+
 }

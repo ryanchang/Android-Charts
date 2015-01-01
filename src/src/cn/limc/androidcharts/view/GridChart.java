@@ -1065,6 +1065,9 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		if ("" == time) {
 			dotInfo.setTime(0);
 		} else {
+			if (time.contains("/")) {
+				time.replaceAll("/", "");
+			}
 			dotInfo.setTime(Integer.parseInt(time));
 		}
 		dotInfo.setAvgPrice(getAvgPrice(0));
@@ -1913,9 +1916,9 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	public void touchUp(PointF pt) {
 		this.touchPoint = pt;
 		this.fromTouch = true;
-		if(crossDisplayListener != null){
+		if (crossDisplayListener != null) {
 			crossDisplayListener.crossDisplay(false, null);
-		}		
+		}
 		this.postInvalidate();
 	}
 
@@ -1952,6 +1955,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 	/**
 	 * 设置手势监听器的探测器
+	 * 
 	 * @param touchGestureDetector
 	 *            the touchGestureDetector to set
 	 */

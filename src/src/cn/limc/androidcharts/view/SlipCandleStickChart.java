@@ -29,6 +29,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 
 /**
  * <p>
@@ -193,8 +194,7 @@ public class SlipCandleStickChart extends SlipStickChart {
 	 * @param attrs
 	 * @param defStyle
 	 */
-	public SlipCandleStickChart(Context context, AttributeSet attrs,
-			int defStyle) {
+	public SlipCandleStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
@@ -259,7 +259,7 @@ public class SlipCandleStickChart extends SlipStickChart {
 	 * スティックを書く
 	 * </p>
 	 * <p>
-	 * 绘制柱条
+	 * 绘制柱条 画出正负的颜色和十字线
 	 * </p>
 	 * 
 	 * @param canvas
@@ -273,8 +273,7 @@ public class SlipCandleStickChart extends SlipStickChart {
 			return;
 		}
 
-		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber
-				- stickSpacing;
+		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
 		float stickX = dataQuadrant.getQuadrantPaddingStartX();
 
 		Paint mPaintPositive = new Paint();
@@ -286,65 +285,57 @@ public class SlipCandleStickChart extends SlipStickChart {
 		Paint mPaintCross = new Paint();
 		mPaintCross.setColor(crossStarColor);
 
-		for (int i = displayFrom; i < displayFrom + displayNumber; i++) {
+		for (int i = displayFrom; i < displayFrom + stickData.size(); i++) {
+			if (i >= stickData.size()) {
+				return;
+			}
 			OHLCEntity ohlc = (OHLCEntity) stickData.get(i);
-			float openY = (float) ((1f - (ohlc.getOpen() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
-			float highY = (float) ((1f - (ohlc.getHigh() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
-			float lowY = (float) ((1f - (ohlc.getLow() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
-			float closeY = (float) ((1f - (ohlc.getClose() - minValue)
-					/ (maxValue - minValue))
-					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
-
+			float openY = (float) ((1f - (ohlc.getOpen() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
+			float highY = (float) ((1f - (ohlc.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
+			float lowY = (float) ((1f - (ohlc.getLow() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
+			float closeY = (float) ((1f - (ohlc.getClose() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+					.getQuadrantPaddingStartY());
+			Log.i("info", "ohlc.getclose=" + ohlc.getClose() + ",getHigh=" + ohlc.getHigh() + ",minValue=" + minValue + "closeY=" + closeY + ",openY=" + openY);
 			if (ohlc.getOpen() < ohlc.getClose()) {
 				// stick or line
 				if (stickWidth >= 2f) {
-					canvas.drawRect(stickX, closeY, stickX + stickWidth, openY,
-							mPaintPositive);
+					canvas.drawRect(stickX, closeY, stickX + stickWidth, openY, mPaintPositive);
 				}
-				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX
-						+ stickWidth / 2f, lowY, mPaintPositive);
+				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX + stickWidth / 2f, lowY, mPaintPositive);
 			} else if (ohlc.getOpen() > ohlc.getClose()) {
 				// stick or line
 				if (stickWidth >= 2f) {
-					canvas.drawRect(stickX, openY, stickX + stickWidth, closeY,
-							mPaintNegative);
+					canvas.drawRect(stickX, openY, stickX + stickWidth, closeY, mPaintNegative);
 				}
-				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX
-						+ stickWidth / 2f, lowY, mPaintNegative);
+				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX + stickWidth / 2f, lowY, mPaintNegative);
 			} else {
 				// line or point
 				if (stickWidth >= 2f) {
-					canvas.drawLine(stickX, closeY, stickX + stickWidth, openY,
-							mPaintCross);
+					canvas.drawLine(stickX, closeY, stickX + stickWidth, openY, mPaintCross);
 				}
-				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX
-						+ stickWidth / 2f, lowY, mPaintCross);
+				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX + stickWidth / 2f, lowY, mPaintCross);
 			}
 
 			// next x
 			stickX = stickX + stickSpacing + stickWidth;
 		}
 	}
-	
+
 	@Override
-	protected PointF calcBindPoint(float x ,float y) {
+	protected PointF calcBindPoint(float x, float y) {
 		float calcX = 0;
 		float calcY = 0;
-		int index = calcSelectedIndex(x,y);
+		int index = calcSelectedIndex(x, y);
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber;
-		OHLCEntity stick = (OHLCEntity)stickData.get(index);
-		calcY = (float) ((1f - (stick.getClose() - minValue)
-				/ (maxValue - minValue))
-				* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+		OHLCEntity stick = (OHLCEntity) stickData.get(index);
+		calcY = (float) ((1f - (stick.getClose() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
+				.getQuadrantPaddingStartY());
 		calcX = dataQuadrant.getQuadrantPaddingStartX() + stickWidth * (index - displayFrom) + stickWidth / 2;
-		
-		return new PointF(calcX,calcY);
+
+		return new PointF(calcX, calcY);
 	}
 
 	/**

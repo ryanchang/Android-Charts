@@ -297,8 +297,11 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		} else if (index < 0) {
 			index = 0;
 		}
-
-		return formatAxisXDegree(stickData.get(index).getDate());
+		if (index < stickData.size()) {
+			return formatAxisXDegree(stickData.get(index).getDate());
+		} else {
+			return formatAxisXDegree(stickData.get(stickData.size() - 1).getDate());
+		}
 	}
 
 	/*

@@ -153,7 +153,7 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
 	 * <p>绘制图表时调用<p>
 	 * 
-	 * @param canvas
+	 * @param canvas 只为添加均线
 	 * 
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
@@ -210,12 +210,16 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 
 			Paint mPaint = new Paint();
 			mPaint.setColor(line.getLineColor());
+			mPaint.setStrokeWidth(line.getLineWidth());
 			mPaint.setAntiAlias(true);
 			// set start point’s X
 			startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
 			// start point
 			PointF ptFirst = null;
 			for (int j = super.getDisplayFrom(); j < super.getDisplayFrom() + super.getDisplayNumber(); j++) {
+				if (j > lineData.size() - 1) {
+					return;
+				}
 				float value = lineData.get(j).getValue();
 				// calculate Y
 				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())

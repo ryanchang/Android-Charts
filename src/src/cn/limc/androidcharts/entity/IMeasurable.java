@@ -40,4 +40,5 @@ public interface IMeasurable {
 	double getHigh();
 
 	double getLow();
+
 }

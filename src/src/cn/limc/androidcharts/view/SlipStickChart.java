@@ -136,6 +136,7 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		super.onDraw(canvas);
 	}
 
+	// 本部分的画柱体的方法不会被调用.
 	@Override
 	protected void drawSticks(Canvas canvas) {
 		if (null == stickData) {

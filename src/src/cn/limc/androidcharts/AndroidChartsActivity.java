@@ -978,8 +978,10 @@ public class AndroidChartsActivity extends Activity {
 
 	}
 
+	// 画蜡烛图方法.
 	private void initMASlipCandleStickChart() {
 		this.maslipcandlestickchart = (MASlipCandleStickChart) findViewById(R.id.maslipcandlestickchart);
+		// 用来存放各个均线实体类
 		List<LineEntity<DateValueEntity>> lines = new ArrayList<LineEntity<DateValueEntity>>();
 
 		// 计算5日均线
@@ -2065,7 +2067,6 @@ public class AndroidChartsActivity extends Activity {
 			}
 			MA5Values.add(new DateValueEntity(avg, (int) ohlc.get(i).getDate()));
 		}
-
 		return MA5Values;
 	}
 
