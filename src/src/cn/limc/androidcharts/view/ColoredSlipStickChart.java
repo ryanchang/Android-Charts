@@ -125,13 +125,21 @@ public class ColoredSlipStickChart extends SlipStickChart {
 		if (stickData.size() == 0) {
 			return;
 		}
-
+		if (getDisplayTo() >= stickData.size()) {
+			setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+		}
+		if (getDisplayFrom() == 0) {
+			setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
+		}
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
 		float stickX = dataQuadrant.getQuadrantPaddingStartX();
 
 		Paint mPaintStick = new Paint();
 
-		for (int i = displayFrom; i < displayFrom + dataSize; i++) {
+		for (int i = displayFrom; i < displayFrom + displayNumber; i++) {
+			if (i < 0 || i > stickData.size() - 1) {
+				continue;
+			}
 			ColoredStickEntity entity = (ColoredStickEntity) stickData.get(i);
 			if (entity == null) {
 				stickX = stickX + stickSpacing + stickWidth;

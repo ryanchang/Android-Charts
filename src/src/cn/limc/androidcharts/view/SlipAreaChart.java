@@ -189,6 +189,9 @@ public class SlipAreaChart extends SlipLineChart {
 			int count = 0;
 			float valueY = dataQuadrant.getQuadrantPaddingHeight() + dataQuadrant.getQuadrantPaddingStartY();
 			for (int j = displayFrom; j < displayFrom + lineData.size(); j++) {
+				if (j < 0 || j > lineData.size() - 1) {
+					return;
+				}
 				if (lineData.get(j) == null) {
 					startX = startX + lineLength;
 					linePath.lineTo(startX, valueY);

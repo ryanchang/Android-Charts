@@ -21,29 +21,29 @@
 
 package cn.limc.androidcharts.event;
 
+import org.apache.http.util.LangUtils;
+
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.MotionEvent;
 
-/**
- * <p>
- * en
- * </p>
- * <p>
- * jp
- * </p>
- * <p>
- * cn
- * </p>
- * 
- * @author limc
- * @version v1.0 2014/06/23 16:48:07
- * 
- */
 public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetector<IZoomable> {
 	protected PointF startPointA;
 	protected PointF startPointB;
+	// private MotionEvent initalEvent;
+	private float initalX;
 
 	private OnSlipGestureListener onSlipGestureListener;
+	private boolean performLongClick;
+	private float mStickScaleValue;
+
+	public boolean isPerformLongClick() {
+		return performLongClick;
+	}
+
+	public void setPerformLongClick(boolean performLongClick) {
+		this.performLongClick = performLongClick;
+	}
 
 	public SlipGestureDetector(ISlipable slipable) {
 		super(slipable);
@@ -52,21 +52,19 @@ public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetecto
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param event
-	 * 
-	 * @return
-	 * 
-	 * @see
-	 * cn.limc.androidcharts.event.IGestureDetector#onTouchEvent(android.view
-	 * .MotionEvent)
-	 */
 	public boolean onTouchEvent(MotionEvent event) {
+		int pointers = event.getPointerCount();
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		// 设置拖拉模式
 		case MotionEvent.ACTION_DOWN:
+			initalX = event.getX();
+			Log.i("info", "initalX=" + initalX);
+			if (pointers > 1) {
+				touchMode = TOUCH_MODE_MULTI;
+			} else {
+				touchMode = TOUCH_MODE_SINGLE;
+				// initalEvent = event;
+			}
 			break;
 		case MotionEvent.ACTION_UP:
 			startPointA = null;
@@ -83,41 +81,54 @@ public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetecto
 				startPointB = new PointF(event.getX(1), event.getY(1));
 			}
 			return true;
-			// break;
 		case MotionEvent.ACTION_MOVE:
-			if (touchMode == TOUCH_MODE_MULTI) {
-				newdistance = calcDistance(event);
-				if (newdistance > MIN_DISTANCE) {
-					if (startPointA.x >= event.getX(0) && startPointB.x >= event.getX(1)) {
+			if (touchMode == TOUCH_MODE_SINGLE) {
+				final float finalX = event.getX();
+				// MotionEvent finalEvent = event;
+				if (performLongClick) {
+					return super.onTouchEvent(event);
+				} else {
+					if (finalX - initalX >= mStickScaleValue) {
 						if (onSlipGestureListener != null) {
 							onSlipGestureListener.onMoveRight((ISlipable) instance, event);
 						}
-					} else if (startPointA.x <= event.getX(0) && startPointB.x <= event.getX(1)) {
+					} else if (initalX - finalX >= mStickScaleValue) {
 						if (onSlipGestureListener != null) {
 							onSlipGestureListener.onMoveLeft((ISlipable) instance, event);
 						}
-					} else {
-						if (Math.abs(newdistance - olddistance) > MIN_DISTANCE) {
-							if (onZoomGestureListener != null) {
-								if (newdistance > olddistance) {
-									onZoomGestureListener.onZoomIn((IZoomable) instance, event);
-								} else {
-									onZoomGestureListener.onZoomOut((IZoomable) instance, event);
-								}
-							}
-							// reset distance
-							olddistance = newdistance;
-						}
 					}
-					startPointA = new PointF(event.getX(0), event.getY(0));
-					startPointB = new PointF(event.getX(1), event.getY(1));
-
+					initalX = finalX;
+					// initalEvent = finalEvent;
 					return true;
 				}
+			} else if (touchMode == TOUCH_MODE_MULTI) {
+				newdistance = calcDistance(event);
+				if (Math.abs(newdistance - olddistance) > MIN_DISTANCE) {
+					if (onZoomGestureListener != null) {
+						if (newdistance > olddistance) {
+							onZoomGestureListener.onZoomIn((IZoomable) instance, event);
+						} else {
+							onZoomGestureListener.onZoomOut((IZoomable) instance, event);
+						}
+					}
+				}
+				olddistance = newdistance;
+				return true;
+				// startPointA = new PointF(event.getX(), event.getY());
+				// startPointB = new PointF(event.getX(1), event.getY(1));
 			}
 			break;
 		}
 		return super.onTouchEvent(event);
 	}
 
+	private float calEventDistance(MotionEvent initalEvent, MotionEvent finalEvent) {
+		float xSpan = initalEvent.getX() - finalEvent.getX();
+		float ySpan = initalEvent.getY() - finalEvent.getY();
+		return (float) Math.sqrt(xSpan * xSpan + ySpan * ySpan);
+	}
+
+	public void setStickScaleValue(float stickScaleValue) {
+		mStickScaleValue = stickScaleValue;
+	}
 }

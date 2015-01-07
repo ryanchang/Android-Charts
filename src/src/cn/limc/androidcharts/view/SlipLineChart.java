@@ -122,14 +122,16 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected OnZoomGestureListener onZoomGestureListener = new OnZoomGestureListener();
 	protected OnSlipGestureListener onSlipGestureListener = new OnSlipGestureListener();
 
-	protected IGestureDetector slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
+	protected SlipGestureDetector<ISlipable> slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
 	protected OnLongClickListener longClickListener = new OnLongClickListener() {
 
 		@Override
 		public boolean onLongClick(View v) {
-			Log.i("info", "66666666666666666666666666");
 			setDisplayCrossXOnTouch(true);
 			setDisplayCrossYOnTouch(true);
+			Log.i("info", "action long click called ");
+			mInLongPress = true;
+			slipGestureDetector.setPerformLongClick(true);
 			slipGestureDetector.onTouchEvent(event);
 			return true;
 		}
@@ -170,8 +172,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	 * @param context
 	 * 
 	 * @param attrs
-	 * 
-	 * 
 	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#GridChart(Context,
 	 * AttributeSet)
@@ -366,7 +366,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		if (lineData == null) {
 			return "";
 		}
-		if (index > lineData.size() - 1) {
+		if (index > lineData.size() - 1 || index < 0) {
 			return "";
 		}
 		return String.valueOf(lineData.get(index).getDate());
@@ -674,6 +674,9 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			PointF ptFirst = null;
 			float valueY = dataQuadrant.getQuadrantPaddingHeight() - dataQuadrant.getQuadrantStartY();
 			for (int j = displayFrom; j < displayFrom + lineData.size(); j++) {
+				if (j > lineData.size() - 1 || j < 0) {
+					return;
+				}
 				if (lineData.get(j) == null) {
 					startX = startX + lineLength;
 					ptFirst = new PointF(startX, valueY);
@@ -727,6 +730,16 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	private boolean displayCrossLongPressed;
 
+	private boolean mInLongPress;
+
+	private float initialX;
+
+	private float initialY;
+
+	private float finalX;
+
+	private float finalY;
+
 	public boolean isDisplayCrossLongPressed() {
 		return displayCrossLongPressed;
 	}
@@ -755,20 +768,16 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			return false;
 		}
 		if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-			setPressed(false);
-			setDisplayCrossXOnTouch(false);
-			setDisplayCrossYOnTouch(false);
+			closeCrossXAndY();
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
 			// setPressed(false);
-			setDisplayCrossXOnTouch(false);
-			setDisplayCrossYOnTouch(false);
+			closeCrossXAndY();
 			boolean focusTaken = false;
 			if (isFocusable() && isFocusableInTouchMode() && !isFocused()) {
 				focusTaken = requestFocus();
 			}
 			if (!mHasPerformedLongPress) {
 				removeCallbacks(mPendingCheckForLongPress);
-				Log.i("info", "33333333333333333333");
 				if (!focusTaken) {
 					if (mPerformClick == null) {
 						mPerformClick = new PerformClick();
@@ -777,12 +786,32 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 				}
 			}
 		} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			initialX = event.getX();
+			initialY = event.getY();
 			mHasPerformedLongPress = false;
+			mInLongPress = false;
 			setPressed(true);
 			this.event = event;
 			checkForLongClick(0);
+		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			finalX = event.getX();
+			finalY = event.getX();
+			// if (Math.abs(finalX - initialX) > 50 || Math.abs(finalY -
+			// initialY) > 50) {
+			// }
+			if (mInLongPress) {
+				slipGestureDetector.setPerformLongClick(true);
+			}
 		}
 		return slipGestureDetector.onTouchEvent(event);
+	}
+
+	private void closeCrossXAndY() {
+		setDisplayCrossXOnTouch(false);
+		setDisplayCrossYOnTouch(false);
+		mInLongPress = false;
+		setPressed(false);
+		slipGestureDetector.setPerformLongClick(false);
 	}
 
 	class PerformClick implements Runnable {
@@ -819,6 +848,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		private int mOriginalWindowAttachCount;
 
 		public void run() {
+			Log.i("info", "action check press called " + isPressed());
 			if (isPressed() && displayCrossLongPressed) {
 				if (performLongClick()) {
 					mHasPerformedLongPress = true;
@@ -881,19 +911,20 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	}
 
 	public void moveRight() {
-		int dataSize = linesData.get(0).getLineData().size();
-		if (displayFrom + displayNumber < dataSize - SLIP_STEP) {
-			displayFrom = displayFrom + SLIP_STEP;
-		} else {
-			displayFrom = dataSize - displayNumber;
-		}
-
-		// 处理displayFrom越界
-		if (displayFrom + displayNumber >= dataSize) {
-			displayFrom = dataSize - displayNumber;
-		}
-
-		this.postInvalidate();
+		return;
+		// int dataSize = linesData.get(0).getLineData().size();
+		// if (displayFrom + displayNumber < dataSize - SLIP_STEP) {
+		// displayFrom = displayFrom + SLIP_STEP;
+		// } else {
+		// displayFrom = dataSize - displayNumber;
+		// }
+		//
+		// // 处理displayFrom越界
+		// if (displayFrom + displayNumber >= dataSize) {
+		// displayFrom = dataSize - displayNumber;
+		// }
+		//
+		// this.postInvalidate();
 
 		// //Listener
 		// if (onSlipGestureListener != null) {
@@ -903,22 +934,23 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	}
 
 	public void moveLeft() {
-		int dataSize = linesData.get(0).getLineData().size();
-
-		if (displayFrom <= SLIP_STEP) {
-			displayFrom = 0;
-		} else if (displayFrom > SLIP_STEP) {
-			displayFrom = displayFrom - SLIP_STEP;
-		} else {
-
-		}
-
-		// 处理displayFrom越界
-		if (displayFrom + displayNumber >= dataSize) {
-			displayFrom = dataSize - displayNumber;
-		}
-
-		this.postInvalidate();
+		return;
+		// int dataSize = linesData.get(0).getLineData().size();
+		//
+		// if (displayFrom <= SLIP_STEP) {
+		// displayFrom = 0;
+		// } else if (displayFrom > SLIP_STEP) {
+		// displayFrom = displayFrom - SLIP_STEP;
+		// } else {
+		//
+		// }
+		//
+		// // 处理displayFrom越界
+		// if (displayFrom + displayNumber >= dataSize) {
+		// displayFrom = dataSize - displayNumber;
+		// }
+		//
+		// this.postInvalidate();
 
 		// //Listener
 		// if (onSlipGestureListener != null) {

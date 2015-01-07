@@ -28,6 +28,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.transition.ChangeBounds;
 import android.util.AttributeSet;
 import android.util.Log;
 
@@ -179,6 +180,8 @@ public class SlipCandleStickChart extends SlipStickChart {
 	 */
 	private int crossStarColor = DEFAULT_CROSS_STAR_COLOR;
 
+	private double ratio;
+
 	/**
 	 * <p>
 	 * Constructor of SlipCandleStickChart
@@ -233,7 +236,6 @@ public class SlipCandleStickChart extends SlipStickChart {
 	 */
 	public SlipCandleStickChart(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -272,10 +274,16 @@ public class SlipCandleStickChart extends SlipStickChart {
 		if (stickData.size() <= 0) {
 			return;
 		}
-
-		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
-		float stickX = dataQuadrant.getQuadrantPaddingStartX();
-
+		float stickX = 0f;
+		float stickWidth = 0f;
+		if (isMoveToLetfEnd()) {
+			stickX = dataQuadrant.getQuadrantPaddingStartX() + getMoveLeftDistance();
+			stickWidth = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber - stickSpacing;
+			setDisplayNumber(displayNumber - getSubDisplayNum());
+		} else {
+			stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
+			stickX = dataQuadrant.getQuadrantPaddingStartX();
+		}
 		Paint mPaintPositive = new Paint();
 		mPaintPositive.setColor(positiveStickFillColor);
 
@@ -284,9 +292,8 @@ public class SlipCandleStickChart extends SlipStickChart {
 
 		Paint mPaintCross = new Paint();
 		mPaintCross.setColor(crossStarColor);
-
-		for (int i = displayFrom; i < displayFrom + stickData.size(); i++) {
-			if (i >= stickData.size()) {
+		for (int i = displayFrom; i < displayFrom + displayNumber; i++) {
+			if (i >= stickData.size() || i < 0) {
 				return;
 			}
 			OHLCEntity ohlc = (OHLCEntity) stickData.get(i);
@@ -298,15 +305,15 @@ public class SlipCandleStickChart extends SlipStickChart {
 					.getQuadrantPaddingStartY());
 			float closeY = (float) ((1f - (ohlc.getClose() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
 					.getQuadrantPaddingStartY());
-			Log.i("info", "ohlc.getclose=" + ohlc.getClose() + ",getHigh=" + ohlc.getHigh() + ",minValue=" + minValue + "closeY=" + closeY + ",openY=" + openY);
 			if (ohlc.getOpen() < ohlc.getClose()) {
 				// stick or line
 				if (stickWidth >= 2f) {
+					// canvas.drawRect(stickX, closeY, stickX + stickWidth,
+					// openY, mPaintPositive);
 					canvas.drawRect(stickX, closeY, stickX + stickWidth, openY, mPaintPositive);
 				}
 				canvas.drawLine(stickX + stickWidth / 2f, highY, stickX + stickWidth / 2f, lowY, mPaintPositive);
 			} else if (ohlc.getOpen() > ohlc.getClose()) {
-				// stick or line
 				if (stickWidth >= 2f) {
 					canvas.drawRect(stickX, openY, stickX + stickWidth, closeY, mPaintNegative);
 				}
@@ -412,4 +419,5 @@ public class SlipCandleStickChart extends SlipStickChart {
 	public void setCrossStarColor(int crossStarColor) {
 		this.crossStarColor = crossStarColor;
 	}
+
 }

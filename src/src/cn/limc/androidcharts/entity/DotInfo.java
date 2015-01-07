@@ -1,16 +1,53 @@
 package cn.limc.androidcharts.entity;
 
 public class DotInfo {
-	private int time;
+	private String time;
 	private double price;
 	private double avgPrice;
 	private double tradeVolume;
 
-	public int getTime() {
+	private double high;
+	private double open;
+	private double low;
+	private double close;
+	
+	public double getHigh() {
+		return high;
+	}
+
+	public void setHigh(double high) {
+		this.high = high;
+	}
+
+	public double getOpen() {
+		return open;
+	}
+
+	public void setOpen(double open) {
+		this.open = open;
+	}
+
+	public double getLow() {
+		return low;
+	}
+
+	public void setLow(double low) {
+		this.low = low;
+	}
+
+	public double getClose() {
+		return close;
+	}
+
+	public void setClose(double close) {
+		this.close = close;
+	}
+
+	public String getTime() {
 		return time;
 	}
 
-	public void setTime(int time) {
+	public void setTime(String time) {
 		this.time = time;
 	}
 

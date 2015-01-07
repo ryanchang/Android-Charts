@@ -55,6 +55,33 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 
 	protected int gridAlignType = DEFAULT_ALIGN_TYPE;
 	protected int bindCrossLinesToStick = DEFAULT_BIND_CROSS_LINES_TO_STICK;
+	private boolean displayTradeVolume;
+	private boolean displayKLine;
+	private boolean displayAxisX;
+
+	public boolean isDisplayAxisX() {
+		return displayAxisX;
+	}
+
+	public void setDisplayAxisX(boolean displayAxisX) {
+		this.displayAxisX = displayAxisX;
+	}
+
+	public boolean isDisplayKLine() {
+		return displayKLine;
+	}
+
+	public void setDisplayKLine(boolean displayKLine) {
+		this.displayKLine = displayKLine;
+	}
+
+	public boolean isDisplayTradeVolume() {
+		return displayTradeVolume;
+	}
+
+	public void setDisplayTradeVolume(boolean displayTradeVolume) {
+		this.displayTradeVolume = displayTradeVolume;
+	}
 
 	/**
 	 * <p>
@@ -71,7 +98,6 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 */
 	public PeriodDataGridChart(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -124,20 +150,27 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 * 初始化X轴的坐标值
 	 * </p>
 	 */
+	// 设置X轴坐标的值.
 	protected void initAxisX() {
 		List<String> titleX = new ArrayList<String>();
-		// if (null != stickData && stickData.size() > 0) {
-		// float average = getDisplayNumber() / this.getLongitudeNum();
-		// for (int i = 0; i < this.getLongitudeNum(); i++) {
-		// int index = (int) Math.floor(i * average);
-		// if (index > getDisplayNumber() - 1) {
-		// index = getDisplayNumber() - 1;
-		// }
-		// titleX.add(formatAxisXDegree(stickData.get(index).getDate()));
-		// }
-		// titleX.add(formatAxisXDegree(stickData.get(getDisplayNumber() -
-		// 1).getDate()));
-		// }
+		if (displayAxisX) {
+			if (null != stickData && stickData.size() > 0) {
+				float average = getDisplayNumber() / this.getLongitudeNum();
+				for (int i = 0; i <= this.getLongitudeNum(); i++) {
+					int index = (int) Math.floor(i * average);
+					if (index > getDisplayNumber() - 1) {
+						index = getDisplayNumber() - 1;
+					}
+					if (index + getDisplayFrom() > stickData.size() - 1) {
+						titleX.add(formatAxisXDegree(stickData.get(stickData.size() - 1).getDate()));
+					} else {
+						titleX.add(formatAxisXDegree(stickData.get(index + getDisplayFrom()).getDate()));
+					}
+				}
+				// titleX.add(formatAxisXDegree(stickData.get(stickData.size() -
+				// 1).getDate()));
+			}
+		}
 		super.setLongitudeTitles(titleX);
 	}
 
@@ -154,14 +187,33 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 	 */
 	protected void initAxisY() {
 		// List<String> titleY = rawAxisY();
-		List<String> titleY = initTitleY();
-		super.setLatitudeTitles(titleY);
+		if (displayKLine) {
+			List<String> titleY = initKLineTitleY();
+			super.setLatitudeTitles(titleY);
+		} else if (displayTradeVolume) {
+			List<String> titleY = initTitleY();
+			super.setLatitudeTitles(titleY);
+		}
+	}
+
+	private List<String> initKLineTitleY() {
+		List<String> titleY = new ArrayList<String>();
+		double numSpan = (maxValue - minValue) / latitudeNum;
+		for (int i = 0; i <= latitudeNum; i++) {
+			titleY.add(String.format("%.2f", minValue + numSpan * i));
+		}
+		return titleY;
 	}
 
 	private List<String> initTitleY() {
 		List<String> titleY = new ArrayList<String>();
-		titleY.add("    手");
-		titleY.add(Long.toString((long) maxValue));
+		if (maxValue > 10000) {
+			titleY.add(" 万手");
+			titleY.add(String.format("%.2f", maxValue / 10000));
+		} else {
+			titleY.add("  手");
+			titleY.add(Long.toString((long) maxValue));
+		}
 		return titleY;
 	}
 

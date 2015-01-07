@@ -21,12 +21,7 @@
 
 package cn.limc.androidcharts.view;
 
-import cn.limc.androidcharts.entity.IMeasurable;
-import cn.limc.androidcharts.event.IGestureDetector;
-import cn.limc.androidcharts.event.ISlipable;
-import cn.limc.androidcharts.event.OnSlipGestureListener;
-import cn.limc.androidcharts.event.SlipGestureDetector;
-import cn.limc.androidcharts.mole.StickMole;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -34,6 +29,18 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.View.OnLongClickListener;
+import cn.limc.androidcharts.entity.ColoredStickEntity;
+import cn.limc.androidcharts.entity.IMeasurable;
+import cn.limc.androidcharts.entity.IStickEntity;
+import cn.limc.androidcharts.event.IGestureDetector;
+import cn.limc.androidcharts.event.ISlipable;
+import cn.limc.androidcharts.event.OnSlipGestureListener;
+import cn.limc.androidcharts.event.SlipGestureDetector;
+import cn.limc.androidcharts.mole.StickMole;
+import cn.limc.androidcharts.view.SlipLineChart.PerformClick;
 
 /**
  * <p>
@@ -63,7 +70,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	protected int zoomBaseLine = DEFAULT_ZOOM_BASE_LINE;
 
 	protected OnSlipGestureListener onSlipGestureListener = new OnSlipGestureListener();
-	protected IGestureDetector slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
+	protected SlipGestureDetector<ISlipable> slipGestureDetector = new SlipGestureDetector<ISlipable>(this);
+	private String textLoadMore;
 
 	/**
 	 * <p>
@@ -94,12 +102,11 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	 * </p>
 	 * 
 	 * @param context
-	 * @param attrs
 	 * @param defStyle
+	 * @param attrs
 	 */
 	public SlipStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -118,7 +125,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	 */
 	public SlipStickChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -134,6 +140,9 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		if (moveContinue && moveToLetfEnd) {
+			drawLoadMoreText(canvas);
+		}
 	}
 
 	// 本部分的画柱体的方法不会被调用.
@@ -145,17 +154,14 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (stickData.size() == 0) {
 			return;
 		}
-
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber() - stickSpacing;
 		float stickX = dataQuadrant.getQuadrantPaddingStartX();
 
 		for (int i = getDisplayFrom(); i < getDisplayTo(); i++) {
 			IMeasurable stick = stickData.get(i);
-
 			StickMole mole = (StickMole) provider.getMole();
 			mole.setUp(this, stick, stickX, stickWidth);
 			mole.draw(canvas);
-
 			// next x
 			stickX = stickX + stickSpacing + stickWidth;
 		}
@@ -167,21 +173,56 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	protected PointF startPointA;
 	protected PointF startPointB;
 	private boolean slipStickChartUnclickable;
+	private boolean mHasPerformedLongPress;
+	private CheckForLongPress mPendingCheckForLongPress;
+	private PerformClick mPerformClick;
+	private MotionEvent event;
+	private boolean displayCrossLongPressed;
+	private int mWindowAttachCount;
+	private OnLongClickListener longClickListener = new OnLongClickListener() {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param event
-	 * 
-	 * @return
-	 * 
-	 * @see
-	 * cn.limc.androidcharts.view.StickChart#onTouchEvent(android.view.MotionEvent
-	 * )
-	 */
+		@Override
+		public boolean onLongClick(View v) {
+			setDisplayCrossXOnTouch(true);
+			setDisplayCrossYOnTouch(false);
+			mInLongPress = true;
+			slipGestureDetector.setPerformLongClick(true);
+			slipGestureDetector.onTouchEvent(event);
+			return true;
+		}
+	};
+	private SelectSectionOnTouchMoveListener onTouchMoveListener;
+	private boolean mInLongPress;
+	private float initialX;
+	private float finalY;
+	private float initialY;
+	private float finalX;
+	private boolean isCheckingLongPress;
+	private boolean moveContinue;
+	private boolean moveToLetfEnd;
+	private int subDisplayNum;
+	private int count;
+	private boolean isToLoadMore;
+	private boolean moveRightIsForbidden;
+
+	public boolean isMoveContinue() {
+		return moveContinue;
+	}
+
+	public void setMoveContinue(boolean moveContinue) {
+		this.moveContinue = moveContinue;
+	}
+
+	public boolean isMoveToLetfEnd() {
+		return moveToLetfEnd;
+	}
+
+	public void setMoveToLetfEnd(boolean moveToLetfEnd) {
+		this.moveToLetfEnd = moveToLetfEnd;
+	}
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// valid
 		if (!isValidTouchPoint(event.getX(), event.getY())) {
 			return false;
 		}
@@ -191,33 +232,164 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (slipStickChartUnclickable) {
 			return false;
 		}
+		if (displayCrossLongPressed) {
+			setOnLongClickListener(longClickListener);
+		}
+		if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
+			moveContinue = false;
+			setPressed(false);
+			closeCrossXAndY();
+		} else if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+			moveContinue = false;
+			setPressed(false);
+			mInLongPress = false;
+			closeCrossXAndY();
+		} else if (event.getAction() == MotionEvent.ACTION_UP) {
+			if (isToLoadMore) {
+				// 在这里添加加载更多
+				onTouchMoveListener.touchToLoadMore(stickData.get(0).getDate());
+				setTextLoadMore("正在加载");
+				moveRightIsForbidden = true;
+				// setDisplayNumber(displayNumber + count);
+				isToLoadMore = false;
+				this.invalidate();
+			}
+			moveContinue = false;
+			mInLongPress = false;
+			closeCrossXAndY();
+			boolean focusTaken = false;
+			if (isFocusable() && isFocusableInTouchMode() && !isFocused()) {
+				focusTaken = requestFocus();
+			}
+			if (!mHasPerformedLongPress) {
+				removeCallbacks(mPendingCheckForLongPress);
+				if (!focusTaken) {
+					if (mPerformClick == null) {
+						mPerformClick = new PerformClick();
+					}
+					performClick();
+				}
+			}
+		} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+			slipGestureDetector.setStickScaleValue(dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
+			mHasPerformedLongPress = false;
+			initialX = event.getX();
+			initialY = event.getY();
+			setPressed(true);
+			mInLongPress = false;
+			this.event = event;
+			checkForLongClick(0);
+		} else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+			moveContinue = true;
+			finalX = event.getX();
+			finalY = event.getY();
+			if (calDistance() > 20) {
+				setPressed(false);
+				slipGestureDetector.setPerformLongClick(false);
+			} else {
+				slipGestureDetector.setPerformLongClick(true);
+			}
+			if (mInLongPress) {
+				slipGestureDetector.setPerformLongClick(true);
+			}
+		}
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.limc.androidcharts.common.ISlipable#moveRight()
-	 */
+	private float calDistance() {
+		float x = finalX - initialX;
+		float y = finalY - initialY;
+		return (float) Math.sqrt(x * x + y * y);
+	}
+
+	private void closeCrossXAndY() {
+		isCheckingLongPress = false;
+		setDisplayCrossXOnTouch(false);
+		setDisplayCrossYOnTouch(false);
+		mInLongPress = false;
+		setPressed(false);
+		slipGestureDetector.setPerformLongClick(false);
+	}
+
+	private void checkForLongClick(int delayOffset) {
+		mHasPerformedLongPress = false;
+		if (mPendingCheckForLongPress == null) {
+			mPendingCheckForLongPress = new CheckForLongPress();
+		}
+		// mPendingCheckForLongPress.rememberWindowAttachCount();
+		postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout() - delayOffset);
+	}
+
+	class CheckForLongPress implements Runnable {
+
+		private int mOriginalWindowAttachCount;
+
+		public void run() {
+			if (isPressed() && displayCrossLongPressed) {
+				isCheckingLongPress = false;
+				if (performLongClick()) {
+					mHasPerformedLongPress = true;
+				}
+			}
+		}
+
+		public void rememberWindowAttachCount() {
+			mOriginalWindowAttachCount = mWindowAttachCount;
+		}
+	}
+
+	class PerformClick implements Runnable {
+
+		@Override
+		public void run() {
+			performClick();
+		}
+	}
+
 	public void moveRight() {
+		if (moveRightIsForbidden) {
+			return;
+		}
 		int dataSize = stickData.size();
-		if (getDisplayTo() < dataSize - SLIP_STEP) {
-			setDisplayFrom(getDisplayFrom() + SLIP_STEP);
-		} else {
-			setDisplayFrom(dataSize - getDisplayNumber());
+		if (getDisplayFrom() >= SLIP_STEP) {
+			setDisplayFrom(getDisplayFrom() - SLIP_STEP);
 		}
-
+		if (getDisplayFrom() < SLIP_STEP) {
+			setDisplayFrom(0);
+		}
+		if (displayFrom == 0) {
+			// 这里设置一个监听器,监听划到最末,加载更多的数据
+			if (moveContinue) {
+				isToLoadMore = true;
+				displayNumber -= 1;
+				count++;
+				moveToLetfEnd = true;
+				setTextLoadMore("加载更多");
+				if (count == 5) {
+					this.invalidate();
+					moveRightIsForbidden = true;
+				}
+				return;
+			}
+		}
+		float[] values = onTouchMoveListener.touchMove(displayFrom, displayNumber);
+		setMaxValue(values[0]);
+		setMinValue(values[1]);
 		// 处理displayFrom越界
-		if (getDisplayTo() >= dataSize) {
-			setDisplayFrom(dataSize - getDisplayNumber());
-		}
-
 		this.postInvalidate();
-
-		// Listener
 		if (onDisplayCursorListener != null) {
 			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 		}
+	}
+
+	// 动态的加载纵轴
+	@Override
+	protected void drawVerticalLine(Canvas canvas) {
+
+	}
+
+	public void drawLoadMoreText(Canvas canvas) {
+		return;
 	}
 
 	public boolean isSlipStickChartUnclickable() {
@@ -228,29 +400,28 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		this.slipStickChartUnclickable = slipStickChartUnclickable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.limc.androidcharts.common.ISlipable#moveLeft()
-	 */
+	public float getMoveLeftDistance() {
+		return (dataQuadrant.getQuadrantPaddingWidth() / displayNumber) * (count);
+	}
+
 	public void moveLeft() {
 		int dataSize = stickData.size();
-
 		if (getDisplayFrom() <= SLIP_STEP) {
-			setDisplayFrom(0);
-		} else if (getDisplayFrom() > SLIP_STEP) {
-			setDisplayFrom(getDisplayFrom() - SLIP_STEP);
-		} else {
-
+			setDisplayFrom(displayFrom + SLIP_STEP);
+		} else if (getDisplayFrom() > SLIP_STEP && getDisplayFrom() < dataSize) {
+			setDisplayFrom(displayFrom + SLIP_STEP);
 		}
-
-		// 处理displayFrom越界
 		if (getDisplayTo() >= dataSize) {
-			setDisplayFrom(dataSize - getDisplayNumber());
+			setDisplayFrom(dataSize - displayNumber);
 		}
-
+		float[] values = onTouchMoveListener.touchMove(displayFrom, displayNumber);
+		setMaxValue(values[0]);
+		setMinValue(values[1]);
+		// 处理displayFrom越界
+		// if (getDisplayTo() >= dataSize) {
+		// setDisplayFrom(dataSize - getDisplayNumber());
+		// }
 		this.postInvalidate();
-
 		// Listener
 		if (onDisplayCursorListener != null) {
 			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
@@ -267,31 +438,35 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (getDisplayNumber() > getMinDisplayNumber()) {
 			// 区分缩放方向
 			if (zoomBaseLine == ZOOM_BASE_LINE_CENTER) {
-				setDisplayNumber(getDisplayNumber() - ZOOM_STEP);
-				setDisplayFrom(getDisplayFrom() + ZOOM_STEP / 2);
+				setDisplayNumber(this.displayNumber - ZOOM_STEP);
+				setDisplayFrom(displayFrom + ZOOM_STEP / 2);
 			} else if (zoomBaseLine == ZOOM_BASE_LINE_LEFT) {
 				setDisplayNumber(getDisplayNumber() - ZOOM_STEP);
 			} else if (zoomBaseLine == ZOOM_BASE_LINE_RIGHT) {
 				setDisplayNumber(getDisplayNumber() - ZOOM_STEP);
 				setDisplayFrom(getDisplayFrom() + ZOOM_STEP);
 			}
-
 			// 处理displayNumber越界
 			if (getDisplayNumber() < getMinDisplayNumber()) {
 				setDisplayNumber(getMinDisplayNumber());
 			}
-
+			if (getDisplayFrom() <= ZOOM_STEP / 2) {
+				setDisplayFrom(0);
+				setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+			}
 			// 处理displayFrom越界
 			if (getDisplayTo() >= stickData.size()) {
 				setDisplayFrom(stickData.size() - getDisplayNumber());
+				setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
 			}
-
-			this.postInvalidate();
-
-			// Listener
-			if (onDisplayCursorListener != null) {
-				onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
-			}
+			float[] values = onTouchMoveListener.touchZoom(displayFrom, displayNumber);
+			setMaxValue(values[0]);
+			setMinValue(values[1]);
+			this.invalidate();
+			// if (onDisplayCursorListener != null) {
+			// onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(),
+			// getDisplayNumber());
+			// }
 		}
 	}
 
@@ -326,17 +501,22 @@ public class SlipStickChart extends StickChart implements ISlipable {
 					}
 				}
 			}
-
 			if (getDisplayTo() >= stickData.size()) {
-				setDisplayNumber(stickData.size() - getDisplayFrom());
+				setDisplayFrom(stickData.size() - getDisplayFrom());
+				setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+			} else if (getDisplayFrom() <= 0) {
+				setDisplayFrom(0);
+				setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
 			}
-
-			this.postInvalidate();
-
+			float[] values = onTouchMoveListener.touchZoom(displayFrom, displayNumber);
+			setMaxValue(values[0]);
+			setMinValue(values[1]);
+			this.invalidate();
 			// Listener
-			if (onDisplayCursorListener != null) {
-				onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
-			}
+			// if (onDisplayCursorListener != null) {
+			// onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(),
+			// getDisplayNumber());
+			// }
 		}
 	}
 
@@ -451,18 +631,25 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		this.zoomBaseLine = zoomBaseLine;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param listener
-	 * 
-	 * @see
-	 * cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc
-	 * .androidcharts.event.OnSlipGestureListener)
-	 */
+	public boolean isMoveRightIsForbidden() {
+		return moveRightIsForbidden;
+	}
+
+	public void setMoveRightIsForbidden(boolean moveRightIsForbidden) {
+		this.moveRightIsForbidden = moveRightIsForbidden;
+	}
+
 	public void setOnSlipGestureListener(OnSlipGestureListener listener) {
 		this.onSlipGestureListener = listener;
 
+	}
+
+	public int getSubDisplayNum() {
+		return subDisplayNum;
+	}
+
+	public void setSubDisplayNum(int subDisplayNum) {
+		this.subDisplayNum = subDisplayNum;
 	}
 
 	/*
@@ -475,4 +662,33 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	public OnSlipGestureListener getOnSlipGestureListener() {
 		return onSlipGestureListener;
 	}
+
+	public boolean isDisplayCrossLongPressed() {
+		return displayCrossLongPressed;
+	}
+
+	public void setDisplayCrossLongPressed(boolean displayCrossLongPressed) {
+		this.displayCrossLongPressed = displayCrossLongPressed;
+	}
+
+	public interface SelectSectionOnTouchMoveListener {
+		float[] touchMove(int j, int displayNum);
+
+		float[] touchZoom(int displayForm, int displayNum);
+
+		void touchToLoadMore(int date);
+	}
+
+	public void setOnSelectSectionOnTouchMoveListener(SelectSectionOnTouchMoveListener onTouchMoveListener) {
+		this.onTouchMoveListener = onTouchMoveListener;
+	}
+
+	public String getTextLoadMore() {
+		return textLoadMore;
+	}
+
+	public void setTextLoadMore(String textLoadMore) {
+		this.textLoadMore = textLoadMore;
+	}
+
 }

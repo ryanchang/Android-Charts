@@ -165,4 +165,14 @@ public class MACDEntity implements IStickEntity {
 		return Math.min(Math.min(getDea(), getDiff()), getMacd());
 	}
 
+	@Override
+	public double getOpen() {
+		return 0;
+	}
+
+	@Override
+	public double getClose() {
+		return 0;
+	}
+
 }

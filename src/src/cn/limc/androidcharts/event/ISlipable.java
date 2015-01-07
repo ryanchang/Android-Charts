@@ -19,31 +19,38 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.event;
 
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/05/29 16:49:51 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/05/29 16:49:51
+ * 
  */
-public interface ISlipable extends IZoomable {	
-	
+public interface ISlipable extends IZoomable {
+
 	static final int SLIP_DIRECTION_NONE = 0;
 	static final int SLIP_DIRECTION_TOP = 1;
 	static final int SLIP_DIRECTION_RIGHT = 2;
 	static final int SLIP_DIRECTION_BOTTOM = 3;
 	static final int SLIP_DIRECTION_LEFT = 4;
-	
-	static final int SLIP_STEP = 4;
-	
+
+	static final int SLIP_STEP = 2;
+
 	void moveLeft();
+
 	void moveRight();
-	
+
 	void setOnSlipGestureListener(OnSlipGestureListener listener);
+
 	OnSlipGestureListener getOnSlipGestureListener();
 }

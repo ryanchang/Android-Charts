@@ -190,4 +190,14 @@ public class StickEntity implements IStickEntity {
 	public void setDate(int date) {
 		this.date = date;
 	}
+
+	@Override
+	public double getOpen() {
+		return 0;
+	}
+
+	@Override
+	public double getClose() {
+		return 0;
+	}
 }

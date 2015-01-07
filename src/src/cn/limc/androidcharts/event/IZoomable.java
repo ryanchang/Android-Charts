@@ -19,32 +19,35 @@
  * limitations under the License.
  */
 
-
 package cn.limc.androidcharts.event;
 
-
-
-/** 
- * <p>en</p>
- * <p>jp</p>
- * <p>cn</p>
- *
- * @author limc 
- * @version v1.0 2014/05/29 16:49:01 
- *  
+/**
+ * <p>
+ * en
+ * </p>
+ * <p>
+ * jp
+ * </p>
+ * <p>
+ * cn
+ * </p>
+ * 
+ * @author limc
+ * @version v1.0 2014/05/29 16:49:01
+ * 
  */
 public interface IZoomable extends ITouchable {
-	
+
 	static final int ZOOM_BASE_LINE_CENTER = 0;
 	static final int ZOOM_BASE_LINE_LEFT = 1;
 	static final int ZOOM_BASE_LINE_RIGHT = 2;
-	
+
 	static final int ZOOM_NONE = 0;
 	static final int ZOOM_IN = 1;
 	static final int ZOOM_OUT = 2;
-	
-	static final int ZOOM_STEP = 4;
-	
+
+	static final int ZOOM_STEP = 1;
+
 	/**
 	 * <p>
 	 * Zoom in the graph
@@ -70,7 +73,8 @@ public interface IZoomable extends ITouchable {
 	 * </p>
 	 */
 	void zoomOut();
-	
+
 	void setOnZoomGestureListener(OnZoomGestureListener listener);
+
 	OnZoomGestureListener getOnZoomGestureListener();
 }

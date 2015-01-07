@@ -148,8 +148,6 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 	 * <p>绘制图表时调用<p>
 	 * 
 	 * @param canvas
-	 * 
-	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
 	// 初始话XY轴,并画出基本的柱状图
 	@Override
@@ -195,7 +193,6 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 				}
 				StickMole mole = (StickMole) provider.getMole();
 				mole.setUp(this, stick, stickX, stickWidth);
-				Log.i("info", "drawStick.isCalled");
 				mole.draw(canvas);
 				// next x
 				stickX = stickX + stickWidth;
@@ -330,6 +327,7 @@ public class StickChart extends PeriodDataGridChart implements IZoomable {
 	 */
 	public void setStickSpacing(float stickSpacing) {
 		this.stickSpacing = stickSpacing;
+		super.setStickSpacing(stickSpacing);
 	}
 
 	/**

@@ -41,4 +41,7 @@ public interface IMeasurable {
 
 	double getLow();
 
+	double getOpen();
+
+	double getClose();
 }

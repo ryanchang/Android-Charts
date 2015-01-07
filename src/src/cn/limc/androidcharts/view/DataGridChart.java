@@ -26,14 +26,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.content.Context;
+import android.graphics.Canvas;
+import android.util.AttributeSet;
 import cn.limc.androidcharts.common.IDataCursor;
 import cn.limc.androidcharts.entity.IChartData;
 import cn.limc.androidcharts.entity.IMeasurable;
 import cn.limc.androidcharts.entity.IStickEntity;
-
-import android.content.Context;
-import android.graphics.Canvas;
-import android.util.AttributeSet;
 
 /**
  * <p>
@@ -56,7 +55,7 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 
 	public static final int DEFAULT_DATA_MULTIPLE = 1;
 	public static final String DEFAULT_AXIS_Y_DECIMAL_FORMAT = "#,##0";
-	public static final String DEFAULT_AXIS_X_DATE_TARGET_FORMAT = "yyyy/MM/dd";
+	public static final String DEFAULT_AXIS_X_DATE_TARGET_FORMAT = "yyyy-MM-dd";
 	public static final String DEFAULT_AXIS_X_DATE_SOURCE_FORMAT = "yyyyMMdd";
 
 	protected int dataMultiple = DEFAULT_DATA_MULTIPLE;
@@ -218,6 +217,9 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	 */
 	protected IChartData<IStickEntity> stickData;
 
+	private float lineLength;
+	private float stickSpacing;
+
 	// protected IDataCursor dataCursor = this;
 
 	/**
@@ -278,6 +280,29 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+	}
+
+	@Override
+	public Object getAxisXObject(Object value) {
+		float graduate = Float.valueOf(super.getAxisXGraduate(value));
+		int index = (int) Math.floor(graduate * getDisplayNumber());
+		if (index + getDisplayFrom() < stickData.size()) {
+			return stickData.get(index + getDisplayFrom());
+		} else {
+			return stickData.get(stickData.size() - 1);
+		}
+	}
+
+	// 根据触控点X的像素点,取到最近的柱状图的中心像素点
+	@Override
+	public float parseTouchXInCenter(float x) {
+		float graduate = Float.valueOf(super.getAxisXGraduate(x));
+		int index = (int) Math.floor(graduate * getDisplayNumber());
+		float span = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
+		if (index == 0) {
+			return span / 2 + dataQuadrant.getQuadrantPaddingStartX() - stickSpacing / 2;
+		}
+		return span / 2 + (index - 1) * span + dataQuadrant.getQuadrantPaddingStartX() - stickSpacing / 2;
 	}
 
 	/*
@@ -435,47 +460,34 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 		this.axisXDateSourceFormat = axisXDateSourceFormat;
 	}
 
-	/**
-	 * @return the maxValue
-	 */
+	public void setLineLength(float lineLength) {
+		this.lineLength = lineLength;
+	}
+
 	public double getMaxValue() {
 		return maxValue;
 	}
 
-	/**
-	 * @param maxValue
-	 *            the maxValue to set
-	 */
 	public void setMaxValue(double maxValue) {
 		this.maxValue = maxValue;
 	}
 
-	/**
-	 * @return the minValue
-	 */
 	public double getMinValue() {
 		return minValue;
 	}
 
-	/**
-	 * @param minValue
-	 *            the minValue to set
-	 */
 	public void setMinValue(double minValue) {
 		this.minValue = minValue;
 	}
 
-	/**
-	 * @return the autoCalcValueRange
-	 */
+	public void setStickSpacing(float stickSpacing) {
+		this.stickSpacing = stickSpacing;
+	}
+
 	public boolean isAutoCalcValueRange() {
 		return autoCalcValueRange;
 	}
 
-	/**
-	 * @param autoCalcValueRange
-	 *            the autoCalcValueRange to set
-	 */
 	public void setAutoCalcValueRange(boolean autoCalcValueRange) {
 		this.autoCalcValueRange = autoCalcValueRange;
 	}

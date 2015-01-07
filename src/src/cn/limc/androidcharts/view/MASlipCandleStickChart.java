@@ -28,9 +28,12 @@ import cn.limc.androidcharts.entity.LineEntity;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 
 /**
  * <p>
@@ -189,8 +192,15 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		if (stickData.size() <= 0) {
 			return;
 		}
+		float lineLength = 0f;
+		if (isMoveToLetfEnd()) {
+			lineLength = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber - stickSpacing;
+			setDisplayNumber(displayNumber - getSubDisplayNum());
+		} else {
+			lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
+		}
+		setLineLength(lineLength);
 		// distance between two points
-		float lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
 		// start point‘s X
 		float startX;
 
@@ -213,18 +223,23 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 			mPaint.setStrokeWidth(line.getLineWidth());
 			mPaint.setAntiAlias(true);
 			// set start point’s X
-			startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+			if (isMoveToLetfEnd()) {
+				startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2 + getMoveLeftDistance();
+			} else {
+				startX = dataQuadrant.getQuadrantPaddingStartX() + lineLength / 2;
+			}
 			// start point
 			PointF ptFirst = null;
 			for (int j = super.getDisplayFrom(); j < super.getDisplayFrom() + super.getDisplayNumber(); j++) {
-				if (j > lineData.size() - 1) {
+				if (j > lineData.size() - 1 || i < 0) {
 					return;
 				}
 				float value = lineData.get(j).getValue();
 				// calculate Y
 				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
 						+ dataQuadrant.getQuadrantPaddingStartY();
-
+				// valueY -= (1 - getSpaceRatio()) / 2 *
+				// dataQuadrant.getQuadrantPaddingHeight();
 				// if is not last point connect to previous point
 				if (j > super.getDisplayFrom()) {
 					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
@@ -234,6 +249,28 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 				startX = startX + stickSpacing + lineLength;
 			}
 		}
+	}
+
+	@Override
+	public void drawLoadMoreText(Canvas canvas) {
+		Paint textPaint = new Paint();
+		textPaint.setColor(Color.GRAY);
+		textPaint.setTextSize(16);
+		int textWidth = getTextBounds(getTextLoadMore(), textPaint);
+		float moveWidth = getMoveLeftDistance();
+		if (moveWidth >= textWidth + 10) {
+			Log.i("info", "toLoadMoreData");
+		}
+		canvas.drawText(getTextLoadMore(), dataQuadrant.getQuadrantPaddingStartX(),
+				dataQuadrant.getQuadrantPaddingHeight() / 2 + dataQuadrant.getQuadrantPaddingStartY(), textPaint);
+	}
+
+	private int getTextBounds(String text, Paint textPaint) {
+		Rect bounds = new Rect();
+		textPaint.getTextBounds(text, 0, text.length(), bounds);
+		int height = bounds.height();
+		int width = bounds.width();
+		return width;
 	}
 
 	/**
