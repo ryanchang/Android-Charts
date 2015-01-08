@@ -58,12 +58,10 @@ public class SlipGestureDetector<T extends ISlipable> extends ZoomGestureDetecto
 		// 设置拖拉模式
 		case MotionEvent.ACTION_DOWN:
 			initalX = event.getX();
-			Log.i("info", "initalX=" + initalX);
 			if (pointers > 1) {
 				touchMode = TOUCH_MODE_MULTI;
 			} else {
 				touchMode = TOUCH_MODE_SINGLE;
-				// initalEvent = event;
 			}
 			break;
 		case MotionEvent.ACTION_UP:

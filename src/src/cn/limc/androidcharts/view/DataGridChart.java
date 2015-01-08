@@ -316,7 +316,6 @@ public abstract class DataGridChart extends GridChart implements IDataCursor {
 	public String getAxisXGraduate(Object value) {
 		float graduate = Float.valueOf(super.getAxisXGraduate(value));
 		int index = (int) Math.floor(graduate * getDisplayNumber());
-
 		if (index >= getDisplayNumber()) {
 			index = getDisplayNumber() - 1;
 		} else if (index < 0) {

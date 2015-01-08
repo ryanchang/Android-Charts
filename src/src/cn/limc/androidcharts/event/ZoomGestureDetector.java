@@ -93,7 +93,6 @@ public class ZoomGestureDetector<T extends IZoomable> extends TouchGestureDetect
 				touchMode = TOUCH_MODE_MULTI;
 			}
 			return true;
-			// break;
 		case MotionEvent.ACTION_MOVE:
 			if (touchMode == TOUCH_MODE_MULTI) {
 				newdistance = calcDistance(event);

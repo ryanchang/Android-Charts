@@ -73,24 +73,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 
-/**
- * 
- * <p>
- * GridChart is base type of all the charts that use a grid to display like
- * line-chart stick-chart etc. GridChart implemented a simple grid with basic
- * functions what can be used in it's inherited charts.
- * </p>
- * <p>
- * GridChartは全部グリドチャートのベスクラスです、一部処理は共通化け実現した。
- * </p>
- * <p>
- * GridChart是所有网格图表的基础类对象，它实现了基本的网格图表功能，这些功能将被它的继承类使用
- * </p>
- * 
- * @author limc
- * @version v1.0 2011/05/30 14:19:50
- * 
- */
 public class GridChart extends AbstractBaseChart implements ITouchable, IFlexableGrid, ICrossLines {
 
 	public static final int AXIS_X_POSITION_BOTTOM = 1 << 0;
@@ -99,30 +81,8 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	public static final int AXIS_Y_POSITION_LEFT = 1 << 2;
 	public static final int AXIS_Y_POSITION_RIGHT = 1 << 3;
 
-	/**
-	 * <p>
-	 * default color of X axis
-	 * </p>
-	 * <p>
-	 * X軸の色のデフォルト値
-	 * </p>
-	 * <p>
-	 * 默认坐标轴X的显示颜色
-	 * </p>
-	 */
 	public static final int DEFAULT_AXIS_X_COLOR = Color.LTGRAY;
 
-	/**
-	 * <p>
-	 * default color of Y axis
-	 * </p>
-	 * <p>
-	 * Y軸の色のデフォルト値
-	 * </p>
-	 * <p>
-	 * 默认坐标轴Y的显示颜色
-	 * </p>
-	 */
 	public static final int DEFAULT_AXIS_Y_COLOR = Color.LTGRAY;
 	public static final float DEFAULT_AXIS_WIDTH = 1f;
 
@@ -130,17 +90,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 	public static final int DEFAULT_AXIS_Y_POSITION = AXIS_Y_POSITION_LEFT;
 
-	/**
-	 * <p>
-	 * default color of grid‘s longitude line
-	 * </p>
-	 * <p>
-	 * 経線の色のデフォルト値
-	 * </p>
-	 * <p>
-	 * 默认网格经线的显示颜色
-	 * </p>
-	 */
 	public static final int DEFAULT_LONGITUDE_COLOR = Color.LTGRAY;
 
 	/**
@@ -733,13 +682,12 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 		if (displayLongitude || displayLongitudeTitle) {
 			drawLongitudeLine(canvas);
-			// drawLongitudeTitle(canvas);
+			drawLongitudeTitle(canvas);
 		}
 		if (displayLatitude || displayLatitudeTitle) {
 			drawLatitudeLine(canvas);
 			drawLatitudeTitle(canvas);
 		}
-
 		if (displayCrossXOnTouch) {
 			drawVerticalLine(canvas);
 		}
@@ -793,63 +741,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		return true;
 	}
 
-	/**
-	 * <p>
-	 * draw some text with border
-	 * </p>
-	 * <p>
-	 * 文字を書く、枠あり
-	 * </p>
-	 * <p>
-	 * 绘制一段文本，并增加外框
-	 * </p>
-	 * 
-	 * @param ptStart
-	 *            <p>
-	 *            start point
-	 *            </p>
-	 *            <p>
-	 *            開始ポイント
-	 *            </p>
-	 *            <p>
-	 *            开始点
-	 *            </p>
-	 * 
-	 * @param ptEnd
-	 *            <p>
-	 *            end point
-	 *            </p>
-	 *            <p>
-	 *            結束ポイント
-	 *            </p>
-	 *            <p>
-	 *            结束点
-	 *            </p>
-	 * 
-	 * @param content
-	 *            <p>
-	 *            text content
-	 *            </p>
-	 *            <p>
-	 *            文字内容
-	 *            </p>
-	 *            <p>
-	 *            文字内容
-	 *            </p>
-	 * 
-	 * @param fontSize
-	 *            <p>
-	 *            font size
-	 *            </p>
-	 *            <p>
-	 *            文字フォントサイズ
-	 *            </p>
-	 *            <p>
-	 *            字体大小
-	 *            </p>
-	 * 
-	 * @param canvas
-	 */
 	private void drawAlphaTextBox(PointF ptStart, PointF ptEnd, String content, int fontSize, Canvas canvas) {
 
 		Paint mPaintBox = new Paint();
@@ -876,39 +767,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		canvas.drawText(content, ptStart.x, ptStart.y + fontSize, mPaintBoxLine);
 	}
 
-	/**
-	 * <p>
-	 * calculate degree title on X axis
-	 * </p>
-	 * <p>
-	 * X軸の目盛を計算する
-	 * </p>
-	 * <p>
-	 * 计算X轴上显示的坐标值
-	 * </p>
-	 * 
-	 * @param value
-	 *            <p>
-	 *            value for calculate
-	 *            </p>
-	 *            <p>
-	 *            計算有用データ
-	 *            </p>
-	 *            <p>
-	 *            计算用数据
-	 *            </p>
-	 * 
-	 * @return String
-	 *         <p>
-	 *         degree
-	 *         </p>
-	 *         <p>
-	 *         目盛
-	 *         </p>
-	 *         <p>
-	 *         坐标值
-	 *         </p>
-	 */
 	public String getAxisXGraduate(Object value) {
 		// 所获取的是触控点所占的屏幕宽度的比例
 		float valueLength = ((Float) value).floatValue() - dataQuadrant.getQuadrantPaddingStartX();
@@ -978,21 +836,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 
 	}
 
-	/**
-	 * <p>
-	 * draw cross line ,called when graph is touched
-	 * </p>
-	 * <p>
-	 * 十字線を書く、グラプをタッチたら、メソードを呼び
-	 * </p>
-	 * <p>
-	 * 在图表被点击后绘制十字线
-	 * </p>
-	 * 
-	 * @param canvas
-	 */
 	protected void drawVerticalLine(Canvas canvas) {
-
 		if (!displayLongitudeTitle) {
 			return;
 		}
@@ -1013,7 +857,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		// 此处可以修改,将两个分时图连接起来
 		mPaint.setStrokeWidth(2f);
 		float lineVLength = dataQuadrant.getQuadrantHeight();
-
 		PointF boxVS = new PointF(touchPoint.x - longitudeFontSize * 5f / 2f, borderWidth + lineVLength);
 		PointF boxVE = new PointF(touchPoint.x + longitudeFontSize * 5f / 2f, borderWidth + lineVLength + axisXTitleQuadrantHeight);
 		// draw text
@@ -1285,7 +1128,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	 * @param canvas
 	 */
 	protected void drawLongitudeTitle(Canvas canvas) {
-
 		if (null == longitudeTitles) {
 			return;
 		}
@@ -1310,18 +1152,17 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		for (int i = 0; i < longitudeTitles.size(); i++) {
 			if (0 == i) {
 				canvas.drawText(longitudeTitles.get(i), offset + 2f, super.getHeight() - axisXTitleQuadrantHeight + longitudeFontSize, mPaintFont);
-
 			} else if (i == longitudeTitles.size() - 1) {
 				canvas.drawText(longitudeTitles.get(i), offset + i * postOffset - (longitudeTitles.get(i).length()) * longitudeFontSize / 2f, super.getHeight()
 						- axisXTitleQuadrantHeight + longitudeFontSize, mPaintFont);
 			} else {
-				canvas.drawText(longitudeTitles.get(i), offset + i * postOffset - getTextBounds(longitudeTitles.get(i), mPaintFont) / 2f, super.getHeight()
+				canvas.drawText(longitudeTitles.get(i), offset + i * postOffset - getTextBoundsWidth(longitudeTitles.get(i), mPaintFont) / 2f, super.getHeight()
 						- axisXTitleQuadrantHeight + longitudeFontSize, mPaintFont);
 			}
 		}
 	}
 
-	private int getTextBounds(String text, Paint textPaint) {
+	public int getTextBoundsWidth(String text, Paint textPaint) {
 		Rect bounds = new Rect();
 		textPaint.getTextBounds(text, 0, text.length(), bounds);
 		int height = bounds.height();
@@ -1329,19 +1170,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		return width;
 	}
 
-	/**
-	 * <p>
-	 * draw latitude lines
-	 * </p>
-	 * <p>
-	 * 緯線を書く
-	 * </p>
-	 * <p>
-	 * 绘制纬线
-	 * </p>
-	 * 
-	 * @param canvas
-	 */
 	protected void drawLatitudeLine(Canvas canvas) {
 
 		if (null == latitudeTitles) {
@@ -2137,9 +1965,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		this.crossLinesFontColor = crossLinesFontColor;
 	}
 
-	/**
-	 * @return the displayCrossXOnTouch
-	 */
 	public boolean isDisplayCrossXOnTouch() {
 		return displayCrossXOnTouch;
 	}

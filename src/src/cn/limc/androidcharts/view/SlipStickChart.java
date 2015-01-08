@@ -21,26 +21,20 @@
 
 package cn.limc.androidcharts.view;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.View.OnLongClickListener;
-import cn.limc.androidcharts.entity.ColoredStickEntity;
 import cn.limc.androidcharts.entity.IMeasurable;
-import cn.limc.androidcharts.entity.IStickEntity;
-import cn.limc.androidcharts.event.IGestureDetector;
 import cn.limc.androidcharts.event.ISlipable;
 import cn.limc.androidcharts.event.OnSlipGestureListener;
 import cn.limc.androidcharts.event.SlipGestureDetector;
 import cn.limc.androidcharts.mole.StickMole;
-import cn.limc.androidcharts.view.SlipLineChart.PerformClick;
 
 /**
  * <p>
@@ -90,53 +84,14 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		super(context);
 	}
 
-	/**
-	 * <p>
-	 * Constructor of SlipStickChart
-	 * </p>
-	 * <p>
-	 * SlipStickChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * SlipStickChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param defStyle
-	 * @param attrs
-	 */
 	public SlipStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
-	/**
-	 * <p>
-	 * Constructor of SlipStickChart
-	 * </p>
-	 * <p>
-	 * SlipStickChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * SlipStickChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param attrs
-	 */
 	public SlipStickChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
-	 * <p>绘制图表时调用<p>
-	 * 
-	 * @param canvas
-	 * 
-	 * @see android.view.View#onDraw(android.graphics.Canvas)
-	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -247,11 +202,18 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		} else if (event.getAction() == MotionEvent.ACTION_UP) {
 			if (isToLoadMore) {
 				// 在这里添加加载更多
-				onTouchMoveListener.touchToLoadMore(stickData.get(0).getDate());
-				setTextLoadMore("正在加载");
-				moveRightIsForbidden = true;
-				// setDisplayNumber(displayNumber + count);
-				isToLoadMore = false;
+				if (moveRightIsForbidden) {
+					onTouchMoveListener.touchToLoadMore(stickData.get(0).getDate());
+					setTextLoadMore("正在加载");
+					moveRightIsForbidden = true;
+					isToLoadMore = false;
+					this.invalidate();
+					return false;
+				}
+			} else {
+				moveToLetfEnd = false;
+				displayNumber += count;
+				count = 0;
 				this.invalidate();
 			}
 			moveContinue = false;
@@ -296,6 +258,8 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
+	
+
 	private float calDistance() {
 		float x = finalX - initialX;
 		float y = finalY - initialY;
@@ -319,6 +283,7 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		// mPendingCheckForLongPress.rememberWindowAttachCount();
 		postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout() - delayOffset);
 	}
+
 
 	class CheckForLongPress implements Runnable {
 
@@ -359,15 +324,15 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		}
 		if (displayFrom == 0) {
 			// 这里设置一个监听器,监听划到最末,加载更多的数据
-			if (moveContinue) {
-				isToLoadMore = true;
+			if (moveContinue && !moveRightIsForbidden) {
 				displayNumber -= 1;
 				count++;
 				moveToLetfEnd = true;
 				setTextLoadMore("加载更多");
+				this.invalidate();
 				if (count == 5) {
-					this.invalidate();
 					moveRightIsForbidden = true;
+					isToLoadMore = true;
 				}
 				return;
 			}
@@ -380,12 +345,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		if (onDisplayCursorListener != null) {
 			onDisplayCursorListener.onCursorChanged(this, getDisplayFrom(), getDisplayNumber());
 		}
-	}
-
-	// 动态的加载纵轴
-	@Override
-	protected void drawVerticalLine(Canvas canvas) {
-
 	}
 
 	public void drawLoadMoreText(Canvas canvas) {
@@ -405,6 +364,15 @@ public class SlipStickChart extends StickChart implements ISlipable {
 	}
 
 	public void moveLeft() {
+		if (moveToLetfEnd) {
+			count--;
+			displayNumber++;
+			if (count <= 0) {
+				moveToLetfEnd = false;
+				return;
+			}
+			this.invalidate();
+		}
 		int dataSize = stickData.size();
 		if (getDisplayFrom() <= SLIP_STEP) {
 			setDisplayFrom(displayFrom + SLIP_STEP);
@@ -470,11 +438,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#zoomOut()
-	 */
 	@Override
 	public void zoomOut() {
 		if (getDisplayNumber() < stickData.size() - 1) {
@@ -520,113 +483,50 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @return
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#getDisplayFrom()
-	 */
 	@Override
 	public int getDisplayFrom() {
 		return displayFrom;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param displayFrom
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#setDisplayFrom(int)
-	 */
 	@Override
 	public void setDisplayFrom(int displayFrom) {
 		this.displayFrom = displayFrom;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @return
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#getDisplayTo()
-	 */
 	@Override
 	public int getDisplayTo() {
 		return displayFrom + displayNumber;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param displayTo
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#setDisplayTo(int)
-	 */
 	@Override
 	public void setDisplayTo(int displayTo) {
 		// TODO
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @return
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#getDisplayNumber()
-	 */
 	@Override
 	public int getDisplayNumber() {
 		return displayNumber;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param displayNumber
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#setDisplayNumber(int)
-	 */
 	@Override
 	public void setDisplayNumber(int displayNumber) {
 		this.displayNumber = displayNumber;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @return
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#getMinDisplayNumber()
-	 */
 	@Override
 	public int getMinDisplayNumber() {
 		return minDisplayNumber;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @param minDisplayNumber
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#setMinDisplayNumber(int)
-	 */
 	@Override
 	public void setMinDisplayNumber(int minDisplayNumber) {
 		this.minDisplayNumber = minDisplayNumber;
 	}
 
-	/**
-	 * @return the zoomBaseLine
-	 */
 	public int getZoomBaseLine() {
 		return zoomBaseLine;
 	}
 
-	/**
-	 * @param zoomBaseLine
-	 *            the zoomBaseLine to set
-	 */
 	public void setZoomBaseLine(int zoomBaseLine) {
 		this.zoomBaseLine = zoomBaseLine;
 	}

@@ -21,6 +21,10 @@
 
 package cn.limc.androidcharts.view;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import cn.limc.androidcharts.entity.OHLCEntity;
 
 import android.content.Context;
@@ -28,6 +32,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.text.format.DateFormat;
 import android.transition.ChangeBounds;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -253,19 +258,6 @@ public class SlipCandleStickChart extends SlipStickChart {
 		super.onDraw(canvas);
 	}
 
-	/**
-	 * <p>
-	 * draw sticks
-	 * </p>
-	 * <p>
-	 * スティックを書く
-	 * </p>
-	 * <p>
-	 * 绘制柱条 画出正负的颜色和十字线
-	 * </p>
-	 * 
-	 * @param canvas
-	 */
 	@Override
 	protected void drawSticks(Canvas canvas) {
 		if (null == stickData) {
@@ -345,24 +337,69 @@ public class SlipCandleStickChart extends SlipStickChart {
 		return new PointF(calcX, calcY);
 	}
 
-	/**
-	 * @return the positiveStickBorderColor
-	 */
+	@Override
+	protected void drawLongitudeLine(Canvas canvas) {
+		Log.i("info", "drawLongitudeLineisCalled");
+		// 画出经线
+		Paint paint = new Paint();
+		paint.setColor(getLongitudeColor());
+		paint.setStrokeWidth(getLongitudeWidth());
+		paint.setAntiAlias(true);
+		Paint textPaint = new Paint();
+		textPaint.setColor(getLongitudeFontColor());
+		textPaint.setStrokeWidth(getLongitudeWidth());
+		textPaint.setAntiAlias(true);
+		int preDate = 0;
+		int date = 0;
+		int index = 0;
+		for (int i = displayFrom; i < displayFrom + displayNumber; i++) {
+			if (i < 0 || i > stickData.size() - 1) {
+				return;
+			}
+			date = stickData.get(i).getDate();
+			if (i > 0) {
+				preDate = stickData.get(i - 1).getDate();
+				if ((preDate / 100) % 100 != (date / 100) % 100) {
+					index = i;
+					canvas.drawLine(calStartX(index - displayFrom), borderWidth / 2, calStartX(index - displayFrom), dataQuadrant.getQuadrantHeight(), paint);
+					canvas.drawText(reformatDate(date), calStartX(index - displayFrom) - super.getTextBoundsWidth(Integer.toString(date), textPaint) / 2,
+							super.getHeight() - axisXTitleQuadrantHeight + getLongitudeFontSize(), textPaint);
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void drawLongitudeTitle(Canvas canvas) {
+	}
+
+	private float calStartX(int i) {
+		float stickSpan = (dataQuadrant.getQuadrantPaddingWidth() / displayNumber);
+		float lineSpan = stickSpan * i + dataQuadrant.getQuadrantPaddingStartX() + stickSpan / 2 - stickSpacing / 2;
+		return lineSpan;
+	}
+
+	private String reformatDate(int date) {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM");
+		Date formattedDate = null;
+		try {
+			formattedDate = formatter.parse(Integer.toString(date));
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return Integer.toString(date);
+		}
+		return formatter2.format(formattedDate);
+	}
+
 	public int getPositiveStickBorderColor() {
 		return positiveStickBorderColor;
 	}
 
-	/**
-	 * @param positiveStickBorderColor
-	 *            the positiveStickBorderColor to set
-	 */
 	public void setPositiveStickBorderColor(int positiveStickBorderColor) {
 		this.positiveStickBorderColor = positiveStickBorderColor;
 	}
 
-	/**
-	 * @return the positiveStickFillColor
-	 */
 	public int getPositiveStickFillColor() {
 		return positiveStickFillColor;
 	}

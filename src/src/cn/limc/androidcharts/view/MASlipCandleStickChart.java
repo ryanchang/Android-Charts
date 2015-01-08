@@ -52,74 +52,21 @@ import android.util.Log;
  */
 public class MASlipCandleStickChart extends SlipCandleStickChart {
 
-	/**
-	 * <p>
-	 * data to draw lines
-	 * </p>
-	 * <p>
-	 * ラインを書く用データ
-	 * </p>
-	 * <p>
-	 * 绘制线条用的数据
-	 * </p>
-	 */
 	private List<LineEntity<DateValueEntity>> linesData;
+	private List<DateValueEntity> lineData;
+	private String[] titles = { "MA5", "MA10", "MA25" };
+	private int textWidthSum;
 
-	/**
-	 * <p>
-	 * Constructor of MASlipCandleStickChart
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param attrs
-	 * @param defStyle
-	 */
 	public MASlipCandleStickChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * <p>
-	 * Constructor of MASlipCandleStickChart
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param attrs
-	 */
 	public MASlipCandleStickChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * <p>
-	 * Constructor of MASlipCandleStickChart
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * MASlipCandleStickChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 */
 	public MASlipCandleStickChart(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -150,41 +97,18 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		this.minValue = minValue;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
-	 * <p>绘制图表时调用<p>
-	 * 
-	 * @param canvas 只为添加均线
-	 * 
-	 * @see android.view.View#onDraw(android.graphics.Canvas)
-	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-
 		// draw lines
 		if (null != this.linesData) {
 			if (0 != this.linesData.size()) {
 				drawLines(canvas);
+				drawMADots(canvas);
 			}
 		}
 	}
 
-	/**
-	 * <p>
-	 * draw lines
-	 * </p>
-	 * <p>
-	 * ラインを書く
-	 * </p>
-	 * <p>
-	 * 绘制线条
-	 * </p>
-	 * 
-	 * @param canvas
-	 */
 	protected void drawLines(Canvas canvas) {
 		if (null == stickData) {
 			return;
@@ -200,10 +124,7 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 			lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
 		}
 		setLineLength(lineLength);
-		// distance between two points
-		// start point‘s X
 		float startX;
-
 		// draw MA lines
 		for (int i = 0; i < linesData.size(); i++) {
 			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
@@ -217,7 +138,6 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 			if (lineData == null) {
 				continue;
 			}
-
 			Paint mPaint = new Paint();
 			mPaint.setColor(line.getLineColor());
 			mPaint.setStrokeWidth(line.getLineWidth());
@@ -238,8 +158,6 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 				// calculate Y
 				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
 						+ dataQuadrant.getQuadrantPaddingStartY();
-				// valueY -= (1 - getSpaceRatio()) / 2 *
-				// dataQuadrant.getQuadrantPaddingHeight();
 				// if is not last point connect to previous point
 				if (j > super.getDisplayFrom()) {
 					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
@@ -256,16 +174,62 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		Paint textPaint = new Paint();
 		textPaint.setColor(Color.GRAY);
 		textPaint.setTextSize(16);
-		int textWidth = getTextBounds(getTextLoadMore(), textPaint);
+		int textWidth = getTextBoundsWidth(getTextLoadMore(), textPaint);
 		float moveWidth = getMoveLeftDistance();
 		if (moveWidth >= textWidth + 10) {
-			Log.i("info", "toLoadMoreData");
 		}
 		canvas.drawText(getTextLoadMore(), dataQuadrant.getQuadrantPaddingStartX(),
 				dataQuadrant.getQuadrantPaddingHeight() / 2 + dataQuadrant.getQuadrantPaddingStartY(), textPaint);
 	}
 
-	private int getTextBounds(String text, Paint textPaint) {
+	private void drawMADots(Canvas canvas) {
+		String drawText = null;
+		for (int i = 0; i < linesData.size(); i++) {
+			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
+			if (line == null) {
+				continue;
+			}
+			if (line.isDisplay() == false) {
+				continue;
+			}
+			lineData = line.getLineData();
+			if (lineData == null) {
+				continue;
+			}
+			Paint mPaint = new Paint();
+			mPaint.setColor(line.getLineColor());
+			mPaint.setStrokeWidth(5f);
+			mPaint.setAntiAlias(true);
+			String priceText = null;
+			if (isDisplayCrossXOnTouch()) {
+				priceText = (String) getAxisLineValue(touchPoint.x);
+			} else {
+				priceText = String.format("%.2f", lineData.get(lineData.size() - 1).getValue());
+			}
+			drawText = titles[i] + " " + priceText;
+			canvas.drawPoint(dataQuadrant.getQuadrantPaddingStartX() + 7 * (i + 1) * 2 + textWidthSum, dataQuadrant.getQuadrantPaddingStartY() + 5, mPaint);
+			canvas.drawText(drawText, dataQuadrant.getQuadrantPaddingStartX() + 5 + (i + 1) * 7 * 2 + textWidthSum, dataQuadrant.getQuadrantPaddingStartY() + 5
+					+ getTextBoundsHeight(priceText, mPaint) / 2, mPaint);
+			if (i < linesData.size() - 1) {
+				textWidthSum += getTextBoundsWidth(drawText, mPaint);
+			}
+		}
+		textWidthSum = 0;
+	}
+
+	public Object getAxisLineValue(Object value) {
+		float valueLength = ((Float) value).floatValue() - dataQuadrant.getQuadrantPaddingStartX();
+		String ratioValue = String.valueOf(valueLength / this.dataQuadrant.getQuadrantPaddingWidth());
+		float graduate = Float.valueOf(ratioValue);
+		int index = (int) Math.floor(graduate * getDisplayNumber());
+		if (index + getDisplayFrom() < lineData.size()) {
+			return String.format("%.2f", lineData.get(index + displayFrom).getValue());
+		} else {
+			return String.format("%.2f", lineData.get(lineData.size() - 1).getValue());
+		}
+	}
+
+	public int getTextBoundsWidth(String text, Paint textPaint) {
 		Rect bounds = new Rect();
 		textPaint.getTextBounds(text, 0, text.length(), bounds);
 		int height = bounds.height();
@@ -273,17 +237,18 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		return width;
 	}
 
-	/**
-	 * @return the linesData
-	 */
+	public int getTextBoundsHeight(String text, Paint textPaint) {
+		Rect bounds = new Rect();
+		textPaint.getTextBounds(text, 0, text.length(), bounds);
+		int height = bounds.height();
+		int width = bounds.width();
+		return height;
+	}
+
 	public List<LineEntity<DateValueEntity>> getLinesData() {
 		return linesData;
 	}
 
-	/**
-	 * @param linesData
-	 *            the linesData to set
-	 */
 	public void setLinesData(List<LineEntity<DateValueEntity>> linesData) {
 		this.linesData = linesData;
 	}
