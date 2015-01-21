@@ -1,7 +1,7 @@
 package cn.limc.androidcharts.entity;
 
 public class DotInfo {
-	private String time;
+	private int time;
 	private double price;
 	private double avgPrice;
 	private double tradeVolume;
@@ -43,11 +43,11 @@ public class DotInfo {
 		this.close = close;
 	}
 
-	public String getTime() {
+	public int getTime() {
 		return time;
 	}
 
-	public void setTime(String time) {
+	public void setTime(int time) {
 		this.time = time;
 	}
 

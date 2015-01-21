@@ -189,7 +189,12 @@ public class ColoredSlipStickChart extends SlipStickChart {
 	public double getTradeNumHigh(float value) {
 		float graduate = Float.valueOf(super.getAxisXGraduate(value));
 		int index = (int) Math.floor(graduate * displayNumber);
-		ColoredStickEntity entity = (ColoredStickEntity) stickData.get(index);
+		ColoredStickEntity entity = null;
+		if (index < stickData.size()) {
+			entity = (ColoredStickEntity) stickData.get(index);
+		} else {
+			entity = (ColoredStickEntity) stickData.get(stickData.size() - 1);
+		}
 		return entity.getHigh();
 	}
 

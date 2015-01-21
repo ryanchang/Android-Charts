@@ -27,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -49,7 +50,6 @@ import cn.limc.androidcharts.mole.StickMole;
  * 
  * @author limc
  * @version v1.0 2014-1-20 下午2:03:08
- * 
  */
 public class SlipStickChart extends StickChart implements ISlipable {
 
@@ -258,8 +258,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
-	
-
 	private float calDistance() {
 		float x = finalX - initialX;
 		float y = finalY - initialY;
@@ -283,7 +281,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		// mPendingCheckForLongPress.rememberWindowAttachCount();
 		postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout() - delayOffset);
 	}
-
 
 	class CheckForLongPress implements Runnable {
 
@@ -385,10 +382,6 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		float[] values = onTouchMoveListener.touchMove(displayFrom, displayNumber);
 		setMaxValue(values[0]);
 		setMinValue(values[1]);
-		// 处理displayFrom越界
-		// if (getDisplayTo() >= dataSize) {
-		// setDisplayFrom(dataSize - getDisplayNumber());
-		// }
 		this.postInvalidate();
 		// Listener
 		if (onDisplayCursorListener != null) {
@@ -396,14 +389,17 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see cn.limc.androidcharts.view.StickChart#zoomIn()
-	 */
+	// 放大
 	@Override
 	public void zoomIn() {
 		if (getDisplayNumber() > getMinDisplayNumber()) {
+			if (displayFrom <= ZOOM_STEP / 2) {
+				setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
+			} else if (displayFrom + displayNumber > stickData.size() - 1) {
+				setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+			} else {
+				setZoomBaseLine(ZOOM_BASE_LINE_CENTER);
+			}
 			// 区分缩放方向
 			if (zoomBaseLine == ZOOM_BASE_LINE_CENTER) {
 				setDisplayNumber(this.displayNumber - ZOOM_STEP);
@@ -438,14 +434,22 @@ public class SlipStickChart extends StickChart implements ISlipable {
 		}
 	}
 
+	// 缩小
 	@Override
 	public void zoomOut() {
-		if (getDisplayNumber() < stickData.size() - 1) {
+		if (getDisplayNumber() < stickData.size()) {
 			if (getDisplayNumber() + ZOOM_STEP > stickData.size() - 1) {
 				setDisplayNumber(stickData.size() - 1);
 				setDisplayFrom(0);
 			} else {
 				// 区分缩放方向
+				if (displayFrom <= ZOOM_STEP / 2) {
+					setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
+				} else if (displayFrom + displayNumber > stickData.size() - 1) {
+					setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+				} else {
+					setZoomBaseLine(ZOOM_BASE_LINE_CENTER);
+				}
 				if (zoomBaseLine == ZOOM_BASE_LINE_CENTER) {
 					setDisplayNumber(getDisplayNumber() + ZOOM_STEP);
 					if (getDisplayFrom() > 1) {
@@ -464,13 +468,13 @@ public class SlipStickChart extends StickChart implements ISlipable {
 					}
 				}
 			}
-			if (getDisplayTo() >= stickData.size()) {
-				setDisplayFrom(stickData.size() - getDisplayFrom());
-				setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
-			} else if (getDisplayFrom() <= 0) {
-				setDisplayFrom(0);
-				setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
-			}
+			// if (getDisplayTo() + ZOOM_STEP / 2 > stickData.size() - 1) {
+			// setDisplayFrom(stickData.size() - getDisplayFrom());
+			// setZoomBaseLine(ZOOM_BASE_LINE_RIGHT);
+			// } else if (getDisplayFrom() < ZOOM_STEP) {
+			// setDisplayFrom(0);
+			// setZoomBaseLine(ZOOM_BASE_LINE_LEFT);
+			// }
 			float[] values = onTouchMoveListener.touchZoom(displayFrom, displayNumber);
 			setMaxValue(values[0]);
 			setMinValue(values[1]);
@@ -554,9 +558,7 @@ public class SlipStickChart extends StickChart implements ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @return
-	 * 
 	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener()
 	 */
 	public OnSlipGestureListener getOnSlipGestureListener() {

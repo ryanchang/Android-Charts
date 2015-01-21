@@ -48,7 +48,6 @@ import android.util.Log;
  * 
  * @author limc
  * @version v1.0 2014/01/21 12:03:25
- * 
  */
 public class MASlipCandleStickChart extends SlipCandleStickChart {
 
@@ -118,7 +117,8 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		}
 		float lineLength = 0f;
 		if (isMoveToLetfEnd()) {
-			lineLength = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber - stickSpacing;
+			lineLength = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber
+					- stickSpacing;
 			setDisplayNumber(displayNumber - getSubDisplayNum());
 		} else {
 			lineLength = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
@@ -156,8 +156,8 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 				}
 				float value = lineData.get(j).getValue();
 				// calculate Y
-				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant.getQuadrantPaddingHeight())
-						+ dataQuadrant.getQuadrantPaddingStartY();
+				float valueY = (float) ((1f - (value - minValue) / (maxValue - minValue)) * dataQuadrant
+						.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY();
 				// if is not last point connect to previous point
 				if (j > super.getDisplayFrom()) {
 					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
@@ -199,6 +199,7 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 			Paint mPaint = new Paint();
 			mPaint.setColor(line.getLineColor());
 			mPaint.setStrokeWidth(5f);
+			mPaint.setTextSize(6 * getResources().getDisplayMetrics().scaledDensity);
 			mPaint.setAntiAlias(true);
 			String priceText = null;
 			if (isDisplayCrossXOnTouch()) {
@@ -207,9 +208,10 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 				priceText = String.format("%.2f", lineData.get(lineData.size() - 1).getValue());
 			}
 			drawText = titles[i] + " " + priceText;
-			canvas.drawPoint(dataQuadrant.getQuadrantPaddingStartX() + 7 * (i + 1) * 2 + textWidthSum, dataQuadrant.getQuadrantPaddingStartY() + 5, mPaint);
-			canvas.drawText(drawText, dataQuadrant.getQuadrantPaddingStartX() + 5 + (i + 1) * 7 * 2 + textWidthSum, dataQuadrant.getQuadrantPaddingStartY() + 5
-					+ getTextBoundsHeight(priceText, mPaint) / 2, mPaint);
+			canvas.drawPoint(dataQuadrant.getQuadrantPaddingStartX() + 7 * (i + 1) * 2 + textWidthSum,
+					dataQuadrant.getQuadrantPaddingStartY() + 5, mPaint);
+			canvas.drawText(drawText, dataQuadrant.getQuadrantPaddingStartX() + 5 + (i + 1) * 7 * 2 + textWidthSum,
+					dataQuadrant.getQuadrantPaddingStartY() + 5 + getTextBoundsHeight(priceText, mPaint) / 2, mPaint);
 			if (i < linesData.size() - 1) {
 				textWidthSum += getTextBoundsWidth(drawText, mPaint);
 			}
@@ -235,14 +237,6 @@ public class MASlipCandleStickChart extends SlipCandleStickChart {
 		int height = bounds.height();
 		int width = bounds.width();
 		return width;
-	}
-
-	public int getTextBoundsHeight(String text, Paint textPaint) {
-		Rect bounds = new Rect();
-		textPaint.getTextBounds(text, 0, text.length(), bounds);
-		int height = bounds.height();
-		int width = bounds.width();
-		return height;
 	}
 
 	public List<LineEntity<DateValueEntity>> getLinesData() {

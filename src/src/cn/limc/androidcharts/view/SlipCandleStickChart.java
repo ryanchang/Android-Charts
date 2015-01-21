@@ -50,7 +50,6 @@ import android.util.Log;
  * 
  * @author limc
  * @version v1.0 2014/01/21 11:37:51
- * 
  */
 public class SlipCandleStickChart extends SlipStickChart {
 
@@ -244,13 +243,9 @@ public class SlipCandleStickChart extends SlipStickChart {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
-	 * <p>绘制图表时调用<p>
-	 * 
+	 * (non-Javadoc) <p>Called when is going to draw this chart<p>
+	 * <p>チャートを書く前、メソッドを呼ぶ<p> <p>绘制图表时调用<p>
 	 * @param canvas
-	 * 
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
 	@Override
@@ -270,7 +265,8 @@ public class SlipCandleStickChart extends SlipStickChart {
 		float stickWidth = 0f;
 		if (isMoveToLetfEnd()) {
 			stickX = dataQuadrant.getQuadrantPaddingStartX() + getMoveLeftDistance();
-			stickWidth = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber - stickSpacing;
+			stickWidth = (dataQuadrant.getQuadrantPaddingWidth() - getMoveLeftDistance()) / displayNumber
+					- stickSpacing;
 			setDisplayNumber(displayNumber - getSubDisplayNum());
 		} else {
 			stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber - stickSpacing;
@@ -289,14 +285,14 @@ public class SlipCandleStickChart extends SlipStickChart {
 				return;
 			}
 			OHLCEntity ohlc = (OHLCEntity) stickData.get(i);
-			float openY = (float) ((1f - (ohlc.getOpen() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
-			float highY = (float) ((1f - (ohlc.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
-			float lowY = (float) ((1f - (ohlc.getLow() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
-			float closeY = (float) ((1f - (ohlc.getClose() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
+			float openY = (float) ((1f - (ohlc.getOpen() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+			float highY = (float) ((1f - (ohlc.getHigh() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+			float lowY = (float) ((1f - (ohlc.getLow() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+			float closeY = (float) ((1f - (ohlc.getClose() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
 			if (ohlc.getOpen() < ohlc.getClose()) {
 				// stick or line
 				if (stickWidth >= 2f) {
@@ -330,8 +326,8 @@ public class SlipCandleStickChart extends SlipStickChart {
 		int index = calcSelectedIndex(x, y);
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / displayNumber;
 		OHLCEntity stick = (OHLCEntity) stickData.get(index);
-		calcY = (float) ((1f - (stick.getClose() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-				.getQuadrantPaddingStartY());
+		calcY = (float) ((1f - (stick.getClose() - minValue) / (maxValue - minValue))
+				* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
 		calcX = dataQuadrant.getQuadrantPaddingStartX() + stickWidth * (index - displayFrom) + stickWidth / 2;
 
 		return new PointF(calcX, calcY);
@@ -339,7 +335,6 @@ public class SlipCandleStickChart extends SlipStickChart {
 
 	@Override
 	protected void drawLongitudeLine(Canvas canvas) {
-		Log.i("info", "drawLongitudeLineisCalled");
 		// 画出经线
 		Paint paint = new Paint();
 		paint.setColor(getLongitudeColor());
@@ -348,6 +343,7 @@ public class SlipCandleStickChart extends SlipStickChart {
 		Paint textPaint = new Paint();
 		textPaint.setColor(getLongitudeFontColor());
 		textPaint.setStrokeWidth(getLongitudeWidth());
+		textPaint.setTextSize(getLongitudeFontSize());
 		textPaint.setAntiAlias(true);
 		int preDate = 0;
 		int date = 0;
@@ -361,9 +357,13 @@ public class SlipCandleStickChart extends SlipStickChart {
 				preDate = stickData.get(i - 1).getDate();
 				if ((preDate / 100) % 100 != (date / 100) % 100) {
 					index = i;
-					canvas.drawLine(calStartX(index - displayFrom), borderWidth / 2, calStartX(index - displayFrom), dataQuadrant.getQuadrantHeight(), paint);
-					canvas.drawText(reformatDate(date), calStartX(index - displayFrom) - super.getTextBoundsWidth(Integer.toString(date), textPaint) / 2,
-							super.getHeight() - axisXTitleQuadrantHeight + getLongitudeFontSize(), textPaint);
+					canvas.drawLine(calStartX(index - displayFrom), borderWidth / 2, calStartX(index - displayFrom),
+							dataQuadrant.getQuadrantHeight(), paint);
+					canvas.drawText(
+							reformatDate(date),
+							calStartX(index - displayFrom)
+									- super.getTextBoundsWidth(Integer.toString(date), textPaint) / 2,
+							super.getHeight() - borderWidth * 3 / 2, textPaint);
 				}
 			}
 		}

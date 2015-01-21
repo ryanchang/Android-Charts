@@ -62,7 +62,6 @@ import cn.limc.androidcharts.event.SlipGestureDetector;
  * 
  * @author limc
  * @version v1.0 2014/01/21 14:20:35
- * 
  */
 public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
@@ -129,7 +128,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		public boolean onLongClick(View v) {
 			setDisplayCrossXOnTouch(true);
 			setDisplayCrossYOnTouch(true);
-			Log.i("info", "action long click called ");
 			mInLongPress = true;
 			slipGestureDetector.setPerformLongClick(true);
 			slipGestureDetector.onTouchEvent(event);
@@ -141,9 +139,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param context
-	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#GridChart(Context)
 	 */
 	public SlipLineChart(Context context) {
@@ -152,13 +148,9 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param context
-	 * 
 	 * @param attrs
-	 * 
 	 * @param defStyle
-	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#GridChart(Context,
 	 * AttributeSet, int)
 	 */
@@ -168,11 +160,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param context
-	 * 
 	 * @param attrs
-	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#GridChart(Context,
 	 * AttributeSet)
 	 */
@@ -290,7 +279,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		// 等分轴修正
 		if (this.latitudeNum > 0 && (long) (this.maxValue - this.minValue) % (this.latitudeNum * rate) != 0) {
 			// 最大值加上轴差
-			this.maxValue = (long) this.maxValue + (this.latitudeNum * rate) - ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
+			this.maxValue = (long) this.maxValue + (this.latitudeNum * rate)
+					- ((long) (this.maxValue - this.minValue) % (this.latitudeNum * rate));
 		}
 	}
 
@@ -311,13 +301,9 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
-	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
-	 * <p>绘制图表时调用<p>
-	 * 
+	 * (non-Javadoc) <p>Called when is going to draw this chart<p>
+	 * <p>チャートを書く前、メソッドを呼ぶ<p> <p>绘制图表时调用<p>
 	 * @param canvas
-	 * 
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
 	@Override
@@ -333,9 +319,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param value
-	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#getAxisXGraduate(Object)
 	 */
 	@Override
@@ -348,9 +332,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		} else if (index < 0) {
 			index = 0;
 		}
-		// if (index < linesData.size()) {
-		// return "";
-		// }
 		index = index + displayFrom;
 		if (null == this.linesData) {
 			return "";
@@ -367,16 +348,14 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			return "";
 		}
 		if (index > lineData.size() - 1 || index < 0) {
-			return "";
+			return String.valueOf(lineData.get(lineData.size() - 1).getDate());
 		}
 		return String.valueOf(lineData.get(index).getDate());
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param value
-	 * 
 	 * @see cn.limc.androidcharts.view.GridChart#getAxisYGraduate(Object)
 	 */
 	@Override
@@ -384,13 +363,19 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		// float graduate = Float.valueOf(super.getAxisYGraduate(value));
 		// return String.valueOf(Math.floor(graduate * (maxValue - minValue) +
 		// minValue));
-		Log.i("info", "Line.getAxisYGraduate");
 		return getGraduate(value);
+	}
+
+	@Override
+	public float getEndLineXPostion() {
+		float ratio = (linesData.size() - 1) / getDisplayNumber();
+		return dataQuadrant.getQuadrantPaddingStartX() + ratio * dataQuadrant.getQuadrantPaddingWidth();
 	}
 
 	private String getGraduate(Object value) {
 		float valueLength = ((Float) value).floatValue() - dataQuadrant.getQuadrantPaddingStartY();
-		double pointPrice = ((valueLength - this.dataQuadrant.getQuadrantPaddingHeight() / 2) / this.dataQuadrant.getQuadrantPaddingHeight() / 2)
+		double pointPrice = ((valueLength - this.dataQuadrant.getQuadrantPaddingHeight() / 2)
+				/ this.dataQuadrant.getQuadrantPaddingHeight() / 2)
 				* maxChangPrice + closingPrice;
 		BigDecimal bd = new BigDecimal(pointPrice);
 		bd.setScale(2, RoundingMode.HALF_UP);
@@ -406,6 +391,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			if (lineData != null) {
 				if (currentIndex <= lineData.size() - 1) {
 					return lineData.get(currentIndex).getValue();
+				} else {
+					return lineData.get(lineData.size() - 1).getValue();
 				}
 			}
 		}
@@ -419,6 +406,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		if (lineData != null) {
 			if (currentIndex < lineData.size()) {
 				return lineData.get(currentIndex).getValue();
+			} else {
+				return lineData.get(lineData.size() - 1).getValue();
 			}
 		}
 		return -1;
@@ -428,7 +417,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	public float getCrossYPostion(float value) {
 		float yValue = getCrossYValue(value);
 		float valueLength = dataQuadrant.getQuadrantPaddingHeight() / 2
-				- (float) (((yValue - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2)) + dataQuadrant.getQuadrantPaddingStartY();
+				- (float) (((yValue - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
+				+ dataQuadrant.getQuadrantPaddingStartY();
 		return valueLength;
 	}
 
@@ -469,7 +459,15 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			setOtherSideLatitudeTitles(rightTitles);
 		}
 		List<String> titleY = initYAxisTitle();
+//		setYTitleWidth(titleY);
 		super.setLatitudeTitles(titleY);
+	}
+
+	private void setYTitleWidth(List<String> rightTitles) {
+		Paint mPaint = new Paint();
+		mPaint.setStrokeWidth(getLatitudeWidth());
+		mPaint.setTextSize(getLatitudeFontSize());
+		setAxisYTitleQuadrantWidth(getTextBoundsWidth(rightTitles.get(0), mPaint) + 4);
 	}
 
 	private List<String> initRightYAxisTitles() {
@@ -562,6 +560,10 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected void initAxisX() {
 		ArrayList<String> titleX = initXAxisDate();
 		// rawMethod(titleX);
+		// Paint textPaint = new Paint();
+		// textPaint.setStrokeWidth(getAxisWidth());
+		// setAxisXTitleQuadrantHeight(getTextBoundsHeight(titleX.get(0),
+		// textPaint) + 4);
 		super.setLongitudeTitles(titleX);
 	}
 
@@ -661,6 +663,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			}
 			Paint mPaint = new Paint();
 			mPaint.setColor(line.getLineColor());
+			mPaint.setStrokeWidth(line.getLineWidth());
 			mPaint.setAntiAlias(true);
 			// set start point’s X
 			if (lineAlignType == ALIGN_TYPE_CENTER) {
@@ -690,7 +693,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 					canvas.drawLine(ptFirst.x, ptFirst.y, startX, valueY, mPaint);
 					continue;
 				}
-				valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
+				valueY = dataQuadrant.getQuadrantPaddingHeight()
+						/ 2
 						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
 						+ dataQuadrant.getQuadrantPaddingStartY();
 				// if is not last point connect to previous point
@@ -832,6 +836,14 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 			p = p.getParent();
 		}
 		return false;
+	}
+
+	@Override
+	public boolean isLineToEnd(float touchX) {
+		float valueLength = ((Float) touchX).floatValue() - dataQuadrant.getQuadrantPaddingStartY();
+		float ratio = 1f - valueLength / this.dataQuadrant.getQuadrantPaddingHeight();
+		int index = (int) Math.floor(ratio * getDisplayNumber());
+		return index + displayFrom > linesData.size() - 1;
 	}
 
 	private void checkForLongClick(int delayOffset) {
@@ -1199,9 +1211,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param listener
-	 * 
 	 * @see
 	 * cn.limc.androidcharts.event.IZoomable#setOnZoomGestureListener(cn.limc
 	 * .androidcharts.event.OnZoomGestureListener)
@@ -1212,9 +1222,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @param listener
-	 * 
 	 * @see
 	 * cn.limc.androidcharts.event.ISlipable#setOnSlipGestureListener(cn.limc
 	 * .androidcharts.event.OnSlipGestureListener)
@@ -1225,9 +1233,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @return
-	 * 
 	 * @see cn.limc.androidcharts.event.ISlipable#getOnSlipGestureListener()
 	 */
 	public OnSlipGestureListener getOnSlipGestureListener() {
@@ -1236,9 +1242,7 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @return
-	 * 
 	 * @see cn.limc.androidcharts.event.IZoomable#getOnZoomGestureListener()
 	 */
 	public OnZoomGestureListener getOnZoomGestureListener() {

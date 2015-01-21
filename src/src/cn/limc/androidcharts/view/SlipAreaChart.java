@@ -27,9 +27,11 @@ import org.apache.http.util.LangUtils;
 
 import cn.limc.androidcharts.entity.DateValueEntity;
 import cn.limc.androidcharts.entity.LineEntity;
+import android.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -47,7 +49,6 @@ import android.util.Log;
  * 
  * @author limc
  * @version v1.0 2014/01/22 16:19:37
- * 
  */
 public class SlipAreaChart extends SlipLineChart {
 
@@ -56,108 +57,38 @@ public class SlipAreaChart extends SlipLineChart {
 	private double maxChangPrice;
 	private int shadowAreaColor;
 
-	/**
-	 * <p>
-	 * Constructor of SlipAreaChart
-	 * </p>
-	 * <p>
-	 * SlipAreaChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * SlipAreaChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param attrs
-	 * @param defStyle
-	 */
 	public SlipAreaChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * <p>
-	 * Constructor of SlipAreaChart
-	 * </p>
-	 * <p>
-	 * SlipAreaChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * SlipAreaChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 * @param attrs
-	 */
 	public SlipAreaChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * <p>
-	 * Constructor of SlipAreaChart
-	 * </p>
-	 * <p>
-	 * SlipAreaChart类对象的构造函数
-	 * </p>
-	 * <p>
-	 * SlipAreaChartのコンストラクター
-	 * </p>
-	 * 
-	 * @param context
-	 */
 	public SlipAreaChart(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * <p>Called when is going to draw this chart<p> <p>チャートを書く前、メソッドを呼ぶ<p>
-	 * <p>绘制图表时调用<p>
-	 * 
-	 * @param canvas
-	 * 
-	 * @see android.view.View#onDraw(android.graphics.Canvas)
-	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		// draw lines
 		drawAreas(canvas);
 	}
 
-	/**
-	 * <p>
-	 * draw lines
-	 * </p>
-	 * <p>
-	 * ラインを書く
-	 * </p>
-	 * <p>
-	 * 绘制线条
-	 * </p>
-	 * 
-	 * @param canvas
-	 */
 	protected void drawAreas(Canvas canvas) {
 		if (null == linesData) {
 			return;
 		}
-		// distance between two points
 		float lineLength;
-		// start point‘s X
 		float startX;
 
-		// draw lines
 		for (int i = 0; i < linesData.size(); i++) {
 			if (i == 1) {
 				return;
 			}
-
 			LineEntity<DateValueEntity> line = (LineEntity<DateValueEntity>) linesData.get(i);
 			if (line == null) {
 				continue;
@@ -171,8 +102,9 @@ public class SlipAreaChart extends SlipLineChart {
 			}
 
 			Paint mPaint = new Paint();
-			mPaint.setColor(line.getShadowAreaColor());
-			mPaint.setAlpha(70);
+			mPaint.setStyle(Style.FILL_AND_STROKE);
+			mPaint.setColor(0x0288d1);
+			mPaint.setAlpha(26);
 			mPaint.setAntiAlias(true);
 
 			// set start point’s X
@@ -210,7 +142,8 @@ public class SlipAreaChart extends SlipLineChart {
 					continue;
 				}
 				count++;
-				valueY = dataQuadrant.getQuadrantPaddingHeight() / 2
+				valueY = dataQuadrant.getQuadrantPaddingHeight()
+						/ 2
 						- (float) (((value - closingPrice) / maxChangPrice) * (dataQuadrant.getQuadrantPaddingHeight() / 2))
 						+ dataQuadrant.getQuadrantPaddingStartY();
 
