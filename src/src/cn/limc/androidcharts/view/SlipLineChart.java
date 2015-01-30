@@ -26,11 +26,13 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.string;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.Shader.TileMode;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.FloatMath;
@@ -77,43 +79,45 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 	protected int minDisplayNumber = DEFAULT_MIN_DISPLAY_NUMBER;
 	protected int zoomBaseLine = DEFAULT_ZOOM_BASE_LINE;
 
-	/**
-	 * <p>
-	 * data to draw lines
-	 * </p>
-	 * <p>
-	 * ラインを書く用データ
-	 * </p>
-	 * <p>
-	 * 绘制线条用的数据
-	 * </p>
-	 */
+	protected float olddistance = 0f;
+	protected float newdistance = 0f;
+
+	protected PointF startPointA;
+	protected PointF startPointB;
+
+	private int displayDataSize;
+
+	private double closingPrice;
+
+	private float maxChangPrice;
+
+	private int shadowAreaColor;
+
+	private boolean canHandleTouchEvent;
+
+	private boolean mHasPerformedLongPress;
+
+	private CheckForLongPress mPendingCheckForLongPress;
+	private int mWindowAttachCount;
+
+	private PerformClick mPerformClick;
+	private MotionEvent event;
+
+	private boolean displayCrossLongPressed;
+
+	private boolean mInLongPress;
+
+	private float initialX;
+
+	private float initialY;
+
+	private float finalX;
+
+	private float finalY;
 	protected List<LineEntity<DateValueEntity>> linesData;
 
-	/**
-	 * <p>
-	 * min value of Y axis
-	 * </p>
-	 * <p>
-	 * F Y軸の最小値
-	 * </p>
-	 * <p>
-	 * Y的最小表示值
-	 * </p>
-	 */
 	protected double minValue;
 
-	/**
-	 * <p>
-	 * max value of Y axis
-	 * </p>
-	 * <p>
-	 * Y軸の最大値
-	 * </p>
-	 * <p>
-	 * Y的最大表示值
-	 * </p>
-	 */
 	protected double maxValue;
 
 	protected int lineAlignType = DEFAULT_LINE_ALIGN_TYPE;
@@ -137,11 +141,8 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 
 	private int currentIndex;
 
-	/*
-	 * (non-Javadoc)
-	 * @param context
-	 * @see cn.limc.androidcharts.view.GridChart#GridChart(Context)
-	 */
+	private boolean onlyMaxAndMinValue;
+
 	public SlipLineChart(Context context) {
 		super(context);
 	}
@@ -455,12 +456,38 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		// 注释掉从数据中计算最大值和最小值
 		// this.calcValueRange();
 		if (isHasTitlesBothSides()) {
-			List<String> rightTitles = initRightYAxisTitles();
-			setOtherSideLatitudeTitles(rightTitles);
+			if (onlyMaxAndMinValue) {
+				List<String> rightTitles = initRightTitles();
+				setOtherSideLatitudeTitles(rightTitles);
+			} else {
+				List<String> rightTitles = initRightYAxisTitles();
+				setOtherSideLatitudeTitles(rightTitles);
+			}
 		}
-		List<String> titleY = initYAxisTitle();
-//		setYTitleWidth(titleY);
+		List<String> titleY = null;
+		if (onlyMaxAndMinValue) {
+			titleY = initYtiles();
+		} else {
+			titleY = initYAxisTitle();
+		}
 		super.setLatitudeTitles(titleY);
+	}
+
+	private List<String> initYtiles() {
+		List<String> titleY = new ArrayList<String>();
+		String yPrice = null;
+		for (int i = 0; i <= this.getLatitudeNum(); i++) {
+			if (i == 0) {
+				double price = Double.parseDouble(String.format("%.2f", closingPrice - maxChangPrice));
+				titleY.add(Double.toString(price));
+			} else if (i == getLatitudeNum()) {
+				double price = closingPrice + maxChangPrice;
+				titleY.add(String.format("%.2f", price));
+			} else {
+				titleY.add("");
+			}
+		}
+		return titleY;
 	}
 
 	private void setYTitleWidth(List<String> rightTitles) {
@@ -468,6 +495,27 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		mPaint.setStrokeWidth(getLatitudeWidth());
 		mPaint.setTextSize(getLatitudeFontSize());
 		setAxisYTitleQuadrantWidth(getTextBoundsWidth(rightTitles.get(0), mPaint) + 4);
+	}
+
+	private List<String> initRightTitles() {
+		List<String> titles = new ArrayList<String>();
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i <= this.getLatitudeNum(); i++) {
+			if (i == 0) {
+				double changePer = maxChangPrice / closingPrice;
+				builder.append("-").append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else if (i == getLatitudeNum()) {
+				double changePer = maxChangPrice / closingPrice;
+				builder.append(String.format("%.2f", changePer * 100d)).append("%");
+				titles.add(builder.toString());
+				builder.setLength(0);
+			} else {
+				titles.add("");
+			}
+		}
+		return titles;
 	}
 
 	private List<String> initRightYAxisTitles() {
@@ -708,42 +756,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		}
 	}
 
-	protected float olddistance = 0f;
-	protected float newdistance = 0f;
-
-	protected PointF startPointA;
-	protected PointF startPointB;
-
-	private int displayDataSize;
-
-	private double closingPrice;
-
-	private float maxChangPrice;
-
-	private int shadowAreaColor;
-
-	private boolean canHandleTouchEvent;
-
-	private boolean mHasPerformedLongPress;
-
-	private CheckForLongPress mPendingCheckForLongPress;
-	private int mWindowAttachCount;
-
-	private PerformClick mPerformClick;
-	private MotionEvent event;
-
-	private boolean displayCrossLongPressed;
-
-	private boolean mInLongPress;
-
-	private float initialX;
-
-	private float initialY;
-
-	private float finalX;
-
-	private float finalY;
-
 	public boolean isDisplayCrossLongPressed() {
 		return displayCrossLongPressed;
 	}
@@ -810,6 +822,14 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		return slipGestureDetector.onTouchEvent(event);
 	}
 
+	public boolean isOnlyMaxAndMinValue() {
+		return onlyMaxAndMinValue;
+	}
+
+	public void setOnlyMaxAndMinValue(boolean onlyMaxAndMinValue) {
+		this.onlyMaxAndMinValue = onlyMaxAndMinValue;
+	}
+
 	private void closeCrossXAndY() {
 		setDisplayCrossXOnTouch(false);
 		setDisplayCrossYOnTouch(false);
@@ -860,7 +880,6 @@ public class SlipLineChart extends GridChart implements IZoomable, ISlipable {
 		private int mOriginalWindowAttachCount;
 
 		public void run() {
-			Log.i("info", "action check press called " + isPressed());
 			if (isPressed() && displayCrossLongPressed) {
 				if (performLongClick()) {
 					mHasPerformedLongPress = true;

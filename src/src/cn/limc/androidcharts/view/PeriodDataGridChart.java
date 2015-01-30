@@ -46,7 +46,6 @@ import android.view.MotionEvent;
  * 
  * @author limc
  * @version v1.0 2014/06/19 14:44:11
- * 
  */
 public abstract class PeriodDataGridChart extends DataGridChart {
 
@@ -158,12 +157,17 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 				float average = getDisplayNumber() / this.getLongitudeNum();
 				for (int i = 0; i <= this.getLongitudeNum(); i++) {
 					int index = (int) Math.floor(i * average);
+					
+					if (index + getDisplayFrom() > stickData.size() - 1 || index + getDisplayFrom() < 0) {
+						continue;
+					}
 					if (index > getDisplayNumber() - 1) {
 						index = getDisplayNumber() - 1;
 					}
 					if (index + getDisplayFrom() > stickData.size() - 1) {
 						titleX.add(formatAxisXDegree(stickData.get(stickData.size() - 1).getDate()));
 					} else {
+						// 待修改
 						titleX.add(formatAxisXDegree(stickData.get(index + getDisplayFrom()).getDate()));
 					}
 				}
@@ -289,8 +293,8 @@ public abstract class PeriodDataGridChart extends DataGridChart {
 
 		float stickWidth = dataQuadrant.getQuadrantPaddingWidth() / getDisplayNumber();
 		IMeasurable stick = stickData.get(index);
-		calcY = (float) ((1f - (stick.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-				.getQuadrantPaddingStartY());
+		calcY = (float) ((1f - (stick.getHigh() - minValue) / (maxValue - minValue))
+				* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
 		calcX = dataQuadrant.getQuadrantPaddingStartX() + stickWidth * (index - getDisplayFrom()) + stickWidth / 2;
 
 		return new PointF(calcX, calcY);

@@ -69,13 +69,39 @@ public class SlipAreaChart extends SlipLineChart {
 
 	public SlipAreaChart(Context context) {
 		super(context);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		drawAreas(canvas);
+	}
+
+	@Override
+	protected void drawOtherSideTitles(Canvas canvas) {
+		if (isOnlyMaxAndMinValue()) {
+			Paint mPaintFont = new Paint();
+			mPaintFont.setColor(getLatitudeFontColor());
+			mPaintFont.setTextSize(getLatitudeFontSize());
+			mPaintFont.setAntiAlias(true);
+			float postOffset = this.dataQuadrant.getQuadrantPaddingHeight() / (latitudeTitles.size() - 1);
+			float offset = super.getHeight() - borderWidth - axisXTitleQuadrantHeight - getAxisWidth()
+					- dataQuadrant.getPaddingBottom();
+			for (int i = 0; i < this.getOtherSideLatitudeTitles().size(); i++) {
+				if (i == 0) {
+					canvas.drawText(this.getOtherSideLatitudeTitles().get(i),
+							super.getWidth() - getTextBoundsWidth(this.getOtherSideLatitudeTitles().get(0), mPaintFont)
+									+ 2f, super.getHeight() - this.axisXTitleQuadrantHeight - borderWidth
+									- getAxisWidth() - 2f, mPaintFont);
+				} else {
+					canvas.drawText(this.getOtherSideLatitudeTitles().get(i),
+							super.getWidth() - getTextBoundsWidth(this.getOtherSideLatitudeTitles().get(0), mPaintFont)
+									+ 2f, offset - i * postOffset + getLatitudeFontSize() / 2f, mPaintFont);
+				}
+			}
+		} else {
+			super.drawOtherSideTitles(canvas);
+		}
 	}
 
 	protected void drawAreas(Canvas canvas) {
@@ -104,7 +130,7 @@ public class SlipAreaChart extends SlipLineChart {
 			Paint mPaint = new Paint();
 			mPaint.setStyle(Style.FILL_AND_STROKE);
 			mPaint.setColor(0x0288d1);
-			mPaint.setAlpha(26);
+			mPaint.setAlpha(54);
 			mPaint.setAntiAlias(true);
 
 			// set start point’s X

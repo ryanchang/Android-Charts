@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import android.R;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -621,44 +622,20 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 	private List<String> otherSideLatitudeTitle;
 	private boolean displayKlineDetail;
 	private float axisYTitleWidth;
+	private int centerLatitudeLineColor = Color.GRAY;
 
-	/*
-	 * (non-Javadoc)
-	 * @param context
-	 * @see cn.limc.androidcharts.view.AbstractBaseChart#BaseChart(Context)
-	 */
 	public GridChart(Context context) {
 		super(context);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @param context
-	 * @param attrs
-	 * @param defStyle
-	 * @see cn.limc.androidcharts.view.AbstractBaseChart#BaseChart(Context,
-	 * AttributeSet, int)
-	 */
 	public GridChart(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @param context
-	 * @param attrs
-	 * @see cn.limc.androidcharts.view.AbstractBaseChart#BaseChart(Context,
-	 * AttributeSet)
-	 */
 	public GridChart(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	/*
-	 * (non-Javadoc) <p>Called when is going to draw this chart<p>
-	 * <p>チャートを書く前、メソッドを呼ぶ<p> <p>绘制图表时调用<p>
-	 * @param canvas // * @see android.view.View#onDraw(android.graphics.Canvas)
-	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -705,12 +682,6 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 				- borderWidth / 2 - axisXTitleQuadrantHeight, mPaint);
 	}
 
-	/*
-	 * (non-Javadoc) 系统的回调方法,当用户点击图标时,同时通过回调方法告诉手势探测器,产生了探测事件 <p>Called when
-	 * chart is touched<p> <p>チャートをタッチしたら、メソッドを呼ぶ<p> <p>图表点击时调用<p>
-	 * @param event
-	 * @see android.view.View#onTouchEvent(MotionEvent)
-	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (!isValidTouchPoint(event.getX(), event.getY())) {
@@ -1133,9 +1104,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		mPaintFont.setColor(longitudeFontColor);
 		mPaintFont.setTextSize(longitudeFontSize);
 		mPaintFont.setAntiAlias(true);
-
 		float postOffset = longitudePostOffset();
-
 		float offset = longitudeOffset();
 		for (int i = 0; i < longitudeTitles.size(); i++) {
 			if (0 == i) {
@@ -1201,7 +1170,7 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 				if (centerLatitudeNeddDashEffect && i == latitudeTitles.size() / 2) {
 					Paint aPaintLine = new Paint();
 					aPaintLine.setStyle(Style.STROKE);
-					aPaintLine.setColor(latitudeColor);
+					aPaintLine.setColor(centerLatitudeLineColor);
 					aPaintLine.setStrokeWidth(latitudeWidth);
 					aPaintLine.setAntiAlias(true);
 					aPaintLine.setPathEffect(dashEffect);
@@ -1288,6 +1257,17 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		if (!hasTitlesBothSides) {
 			return;
 		}
+		drawOtherSideTitles(canvas);
+	}
+
+	protected void drawOtherSideTitles(Canvas canvas) {
+		Paint mPaintFont = new Paint();
+		mPaintFont.setColor(latitudeFontColor);
+		mPaintFont.setTextSize(latitudeFontSize);
+		mPaintFont.setAntiAlias(true);
+		float postOffset = this.dataQuadrant.getQuadrantPaddingHeight() / (latitudeTitles.size() - 1);
+		float offset = super.getHeight() - borderWidth - axisXTitleQuadrantHeight - axisWidth
+				- dataQuadrant.getPaddingBottom();
 		for (int i = 0; i < this.otherSideLatitudeTitle.size(); i++) {
 			if (i == 0) {
 				canvas.drawText(this.otherSideLatitudeTitle.get(i), super.getWidth() - axisYTitleQuadrantWidth + 2f,
@@ -1692,7 +1672,14 @@ public class GridChart extends AbstractBaseChart implements ITouchable, IFlexabl
 		} else {
 			return touchPoint.x;
 		}
+	}
 
+	public int getCenterLatitudeLineColor() {
+		return centerLatitudeLineColor;
+	}
+
+	public void setCenterLatitudeLineColor(int centerLatitudeLineColor) {
+		this.centerLatitudeLineColor = centerLatitudeLineColor;
 	}
 
 	/**
