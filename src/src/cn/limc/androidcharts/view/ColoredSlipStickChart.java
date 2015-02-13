@@ -44,7 +44,6 @@ import android.util.Log;
  * 
  * @author limc
  * @version v1.0 2014/01/20 16:20:40
- * 
  */
 public class ColoredSlipStickChart extends SlipStickChart {
 
@@ -149,10 +148,10 @@ public class ColoredSlipStickChart extends SlipStickChart {
 				stickX = stickX + stickSpacing + stickWidth;
 				continue;
 			}
-			float highY = (float) ((1f - (entity.getHigh() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
-			float lowY = (float) ((1f - (entity.getLow() - minValue) / (maxValue - minValue)) * (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant
-					.getQuadrantPaddingStartY());
+			float highY = (float) ((1f - (entity.getHigh() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
+			float lowY = (float) ((1f - (entity.getLow() - minValue) / (maxValue - minValue))
+					* (dataQuadrant.getQuadrantPaddingHeight()) + dataQuadrant.getQuadrantPaddingStartY());
 			mPaintStick.setColor(entity.getColor());
 			// stick or line?
 			if (stickWidth >= 2f) {
